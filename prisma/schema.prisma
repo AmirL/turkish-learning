@@ -26,10 +26,14 @@ model Word {
   id          Int      @id @default(autoincrement()) @db.UnsignedInt
   word        String?  @db.VarChar(255)
   translation String?  @db.VarChar(255)
+  languageSource    String?  @db.VarChar(2) @default("tr")
+  languageTarget    String?  @db.VarChar(2) @default("ru")
   topicId    Int?     @db.UnsignedInt
   images      Images[]
   progress    UserProgress[]
   topic       Topic?   @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Word_topicId_fkey")
+
+  @@index([topicId], map: "topicId")
 }
 
 model Topic {
