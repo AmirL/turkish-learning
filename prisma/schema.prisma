@@ -11,10 +11,69 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email     String   @unique
   password  String
   name      String?
+  progress  UserProgress[]
+  studySessions StudySession[]
+}
+
+model Word {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  word        String?  @db.VarChar(255)
+  translation String?  @db.VarChar(255)
+  topicId    Int?     @db.UnsignedInt
+  images      Images[]
+  progress    UserProgress[]
+  topic       Topic?   @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "WordTopicRel")
+}
+
+model Topic {
+  id     Int      @id @default(autoincrement()) @db.UnsignedInt
+  name   String?  @db.VarChar(255)
+  words  Word[]
+}
+
+model UserProgress {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId   Int     @db.UnsignedInt
+  wordId   Int     @db.UnsignedInt
+  level  Int     @db.UnsignedInt @default(0)
+  nextReview DateTime?
+  correct     Int     @db.UnsignedInt @default(0)
+  wrong       Int     @db.UnsignedInt @default(0)
+  views      Int     @db.UnsignedInt @default(0)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "UserProgressUserRel")
+  word      Word?    @relation(fields: [wordId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "UserProgressWordRel")
+
+  @@index([userId], map: "userId")
+  @@index([wordId], map: "wordId")
+}
+
+// keep stats about user study sessions per day
+model StudySession {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId   Int     @db.UnsignedInt
+  date      DateTime @default(now())
+  words     Int     @db.UnsignedInt @default(0)
+  correct  Int    @db.UnsignedInt @default(0)
+  wrong     Int     @db.UnsignedInt @default(0)
+  known     Int     @db.UnsignedInt @default(0)
+  shown     Int     @db.UnsignedInt @default(0)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "StudySessionUserRel")
+
+  @@index([userId], map: "userId")
+}
+
+model Images {
+  id       Int      @id @default(autoincrement()) @db.UnsignedInt
+  wordId  Int     @db.UnsignedInt
+  link     String  @db.VarChar(500)
+  selected Boolean @default(false)
+  word     Word?    @relation(fields: [wordId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "ImagesWordRel")
+
+  @@index([wordId], map: "wordId")
 }
