@@ -1,5 +1,6 @@
-import type { MetaFunction } from '@remix-run/node';
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch } from '@remix-run/react';
+import type { LoaderFunction, MetaFunction } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch, useLoaderData } from '@remix-run/react';
 
 import { withEmotionCache } from '@emotion/react';
 import { unstable_useEnhancedEffect as useEnhancedEffect } from '@mui/material';
@@ -7,12 +8,21 @@ import { unstable_useEnhancedEffect as useEnhancedEffect } from '@mui/material';
 import ClientStyleContext from '~/mui/ClientStyleContext';
 import { useContext } from 'react';
 import Layout from '~/components/Layout';
+import mainStyle from '~/layout.css';
+import { getLoggedUser } from './utils/auth.server';
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'New Remix App',
+  title: 'Learning Words',
   viewport: 'width=device-width,initial-scale=1',
 });
+
+export function links() {
+  return [
+    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap' },
+    { rel: 'stylesheet', href: mainStyle },
+  ];
+}
 
 interface DocumentProps {
   children: React.ReactNode;
@@ -47,7 +57,6 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
         {title ? <title>{title}</title> : null}
         <Meta />
         <Links />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
         <meta name="emotion-insertion-point" content="emotion-insertion-point" />
       </head>
       <body>
@@ -60,10 +69,16 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
   );
 });
 
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await getLoggedUser(request);
+  return json({ user });
+};
+
 export default function App() {
+  const data = useLoaderData<typeof loader>();
   return (
     <Document>
-      <Layout>
+      <Layout user={data?.user}>
         <Outlet />
       </Layout>
     </Document>

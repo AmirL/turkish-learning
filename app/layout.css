@@ -1,0 +1,11 @@
+/* disable underline for links */
+a {
+  text-decoration: none;
+}
+
+/* add border line around file input */
+input[type='file'] {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 15px;
+}

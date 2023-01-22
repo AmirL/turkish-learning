@@ -1,4 +1,4 @@
-import { Authenticator, AuthorizationError } from 'remix-auth';
+import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 import { sessionStorage } from '~/utils/session.server';
 import { invariant, redirect } from '@remix-run/router';
@@ -32,11 +32,33 @@ authenticator.use(
 
 export default authenticator;
 
+/**
+ * @param request
+ * @param refreshUser - load the user from the database to get the latest data
+ * @returns user
+ */
+export async function getLoggedUser(request: Request) {
+  const user = await authenticator.isAuthenticated(request);
+
+  if (user instanceof Error) {
+    throw redirect('/login');
+  }
+
+  return user;
+}
+
+/**
+ * @param request
+ * @param refreshUser - load the user from the database to get the latest data
+ * @returns user
+ */
 export async function requireUser(request: Request) {
   const user = await authenticator.isAuthenticated(request, { failureRedirect: '/login' });
+
   if (user instanceof Error || !user) {
     throw redirect('/login');
   }
+
   return user;
 }
 

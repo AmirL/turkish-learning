@@ -18,6 +18,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
+  editor   Boolean  @default(false)
   progress  UserProgress[]
   studySessions StudySession[]
 }

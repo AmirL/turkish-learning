@@ -12,7 +12,7 @@ function validateEmail(email: unknown) {
   if (typeof email !== 'string') return 'Email is required';
   const regex =
     /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-  if (String(email).match(regex)) return 'Email is invalid';
+  if (!String(email).match(regex)) return 'Email is invalid';
 }
 
 function validatePassword(password: unknown) {
