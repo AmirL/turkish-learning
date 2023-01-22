@@ -25,7 +25,7 @@ model User {
 
 model Word {
   id          Int      @id @default(autoincrement()) @db.UnsignedInt
-  word        String?  @db.VarChar(255)
+  word        String?  @db.VarChar(255) @unique
   translation String?  @db.VarChar(255)
   languageSource    String?  @db.VarChar(2) @default("tr")
   languageTarget    String?  @db.VarChar(2) @default("ru")
@@ -39,7 +39,7 @@ model Word {
 
 model Topic {
   id     Int      @id @default(autoincrement()) @db.UnsignedInt
-  name   String?  @db.VarChar(255)
+  name   String?  @db.VarChar(255) @unique
   words  Word[]
 }
 

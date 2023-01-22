@@ -10,15 +10,12 @@ import type { User } from '~/models/user.server';
 
 export default function Layout({ children, user = null }: { children: React.ReactNode; user?: User | null }) {
   const location = useLocation();
-  console.log(location);
 
   const navBar = [
     { label: 'Home', icon: <HomeIcon />, link: '/' },
     { label: 'Import', icon: <ImportExportIcon />, link: '/import' },
     { label: 'User', icon: <AccountBoxIcon />, link: '/user' },
   ];
-
-  const [activeButton, setActiveButton] = React.useState(location.pathname);
 
   // remove import tab for non editors
   if (user && user.editor === false) {
@@ -30,12 +27,7 @@ export default function Layout({ children, user = null }: { children: React.Reac
       <Box sx={{ my: 4 }}>{children}</Box>
       {user ? (
         <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-          <BottomNavigation
-            value={activeButton}
-            onChange={(event, newValue) => {
-              setActiveButton(newValue);
-            }}
-          >
+          <BottomNavigation value={location.pathname}>
             {navBar.map((item) => (
               <BottomNavigationAction
                 component={Link}
