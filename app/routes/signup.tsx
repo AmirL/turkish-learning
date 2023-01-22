@@ -1,7 +1,7 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
 
-import { Form, Link, useSearchParams, useActionData } from '@remix-run/react';
+import { Form, Link, useSearchParams, useActionData, useTransition } from '@remix-run/react';
 
 import { createUser, getUserByEmail } from '~/models/user.server';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
@@ -10,8 +10,9 @@ import authenticator, { login } from '~/utils/auth.server';
 
 function validateEmail(email: unknown) {
   if (typeof email !== 'string') return 'Email is required';
-  if (email.length < 3) return 'Email is too short';
-  if (!email.includes('@')) return 'Email is invalid';
+  const regex =
+    /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+  if (String(email).match(regex)) return 'Email is invalid';
 }
 
 function validatePassword(password: unknown) {
@@ -76,6 +77,9 @@ export default function Signup() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') ?? undefined;
   const data = useActionData<typeof action>();
+  const transition = useTransition();
+
+  const submitText = transition.state !== 'idle' ? 'Signing up...' : 'Sign Up';
 
   return (
     <Box sx={{ textAlign: 'center' }} maxWidth="xs">
@@ -133,8 +137,8 @@ export default function Signup() {
             />
           </Grid>
           <Grid item xs={12}>
-            <Button type="submit" variant="contained">
-              Sign Up
+            <Button type="submit" variant="contained" disabled={transition.state !== 'idle'}>
+              {submitText}
             </Button>
           </Grid>
         </Grid>

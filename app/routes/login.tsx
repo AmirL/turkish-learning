@@ -2,7 +2,7 @@ import type { LoaderFunction, ActionFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
 import authenticator, { login } from '~/utils/auth.server';
 import { json } from '@remix-run/node';
-import { Form, Link, useActionData } from '@remix-run/react';
+import { Form, Link, useActionData, useTransition } from '@remix-run/react';
 import { Box } from '@mui/system';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
@@ -56,6 +56,9 @@ export const action: ActionFunction = async ({ request, context }) => {
 
 export default function Login() {
   const actionData = useActionData<typeof action>();
+  const transtion = useTransition();
+
+  const submitText = transtion.state === 'idle' ? 'Login' : 'Logging in...';
 
   return (
     <Box sx={{ textAlign: 'center' }} maxWidth="xs">
@@ -94,8 +97,8 @@ export default function Login() {
             />
           </Grid>
           <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              Login
+            <Button type="submit" variant="contained" color="primary" fullWidth disabled={transtion.state !== 'idle'}>
+              {submitText}
             </Button>
           </Grid>
         </Grid>
