@@ -14,7 +14,7 @@ export default function Layout({ children, user = null }: { children: React.Reac
   const navBar = [
     { label: 'Home', icon: <HomeIcon />, link: '/' },
     { label: 'Import', icon: <ImportExportIcon />, link: '/import' },
-    { label: 'User', icon: <AccountBoxIcon />, link: '/user' },
+    { label: 'Profile', icon: <AccountBoxIcon />, link: '/profile' },
   ];
 
   // remove import tab for non editors
