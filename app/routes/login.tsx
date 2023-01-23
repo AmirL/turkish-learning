@@ -1,6 +1,6 @@
 import type { LoaderFunction, ActionFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
-import authenticator, { login } from '~/utils/auth.server';
+import authenticator, { getLoggedUser, login } from '~/utils/auth.server';
 import { json } from '@remix-run/node';
 import { Form, Link, useActionData, useTransition } from '@remix-run/react';
 import { Box } from '@mui/system';
@@ -8,10 +8,8 @@ import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(request);
-  if (user !== null && user instanceof Error === false) {
-    return redirect('/');
-  }
+  const user = await getLoggedUser(request, true);
+  if (user) return redirect('/');
 
   return json({});
 };

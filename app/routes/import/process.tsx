@@ -29,24 +29,25 @@ export const action: ActionFunction = async ({ request }) => {
   invariant(table.length > 0, 'Data is an empty array');
   invariant(table.every(IsRowType), 'Data is not an array of rows');
 
-  // get topics ids
-  const topics = table.map((row) => row.topic);
-  const uniqueTopics = [...new Set(topics)];
   await db.topic.createMany({
-    data: uniqueTopics.map((topic) => ({ name: topic })),
+    data: table.map((topic) => ({
+      name: topic.topic,
+      languageSource: topic.languageSource,
+      languageTarget: topic.languageTarget,
+    })),
     skipDuplicates: true,
   });
 
-  const topicsIds = await getTopicsIds(uniqueTopics);
+  const uniqueTopicNames = [...new Set(table.map((topic) => topic.topic))];
+
+  const topicsIds = await getTopicsIds(uniqueTopicNames);
 
   // prepare words objetcs
   const words = table.map((row) => {
     return {
       word: row.word,
       translation: row.translation,
-      languageSource: row.languageSource,
-      languageTarget: row.languageTarget,
-      topic_id: topicsIds[row.topic],
+      topic_id: topicsIds[`${row.topic}-${row.languageSource}-${row.languageTarget}`],
     };
   });
 
@@ -63,12 +64,12 @@ export const action: ActionFunction = async ({ request }) => {
 async function getTopicsIds(uniqueTopics: string[]) {
   const topicsIds = await db.topic.findMany({
     where: { name: { in: uniqueTopics } },
-    select: { id: true, name: true },
   });
 
   const topicIdsMap = topicsIds.reduce((acc, topic) => {
     if (topic.name) {
-      acc[topic.name] = topic.id;
+      // use name, languageSource, languageTarget as key
+      acc[`${topic.name}-${topic.languageSource}-${topic.languageTarget}`] = topic.id;
     }
     return acc;
   }, {} as Record<string, number>);
@@ -85,7 +86,7 @@ export default function ImportFromCsv() {
         <Typography variant="body1">Words created: {data?.created}</Typography>
         <Typography variant="body1">Words skipped: {data?.skipped}</Typography>
       </Box>
-      <Link to="/">
+      <Link to="/import">
         <Button variant="contained">Go back</Button>
       </Link>
     </Box>

@@ -6,24 +6,13 @@ import { Form, Link, useSearchParams, useActionData, useTransition } from '@remi
 import { createUser, getUserByEmail } from '~/models/user.server';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
-import authenticator, { login } from '~/utils/auth.server';
+import { getLoggedUser, login } from '~/utils/auth.server';
 
-function validateEmail(email: unknown) {
-  if (typeof email !== 'string') return 'Email is required';
-  const regex =
-    /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-  if (!String(email).match(regex)) return 'Email is invalid';
-}
-
-function validatePassword(password: unknown) {
-  if (typeof password !== 'string') return 'Password is required';
-  if (password.length < 6) return 'Password is too short';
-}
-
-function validateConfirmPassword(password: unknown, confirmPassword: unknown) {
-  if (typeof confirmPassword !== 'string') return 'Confirm password is required';
-  if (password !== confirmPassword) return 'Passwords do not match';
-}
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await getLoggedUser(request, true);
+  if (user) return redirect('/');
+  return json({});
+};
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
@@ -62,15 +51,6 @@ export const action: ActionFunction = async ({ request }) => {
 
   const user = await createUser(email, password);
   return await login(user, request, redirectTo);
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(request);
-  if (user !== null && user instanceof Error === false) {
-    return redirect('/');
-  }
-  console.log(user);
-  return json({});
 };
 
 export default function Signup() {
@@ -149,4 +129,21 @@ export default function Signup() {
       </p>
     </Box>
   );
+}
+
+function validateEmail(email: unknown) {
+  if (typeof email !== 'string') return 'Email is required';
+  const regex =
+    /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+  if (!String(email).match(regex)) return 'Email is invalid';
+}
+
+function validatePassword(password: unknown) {
+  if (typeof password !== 'string') return 'Password is required';
+  if (password.length < 6) return 'Password is too short';
+}
+
+function validateConfirmPassword(password: unknown, confirmPassword: unknown) {
+  if (typeof confirmPassword !== 'string') return 'Confirm password is required';
+  if (password !== confirmPassword) return 'Passwords do not match';
 }

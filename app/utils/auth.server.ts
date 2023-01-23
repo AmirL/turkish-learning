@@ -4,6 +4,7 @@ import { sessionStorage } from '~/utils/session.server';
 import { invariant, redirect } from '@remix-run/router';
 import type { User } from '~/models/user.server';
 import { verifyLogin } from '~/models/user.server';
+import { db } from './db.server';
 
 // Create an instance of the authenticator, pass a Type, User,  with what
 // strategies will return and will store in the session
@@ -37,25 +38,35 @@ export default authenticator;
  * @param refreshUser - load the user from the database to get the latest data
  * @returns user
  */
-export async function getLoggedUser(request: Request) {
-  const user = await authenticator.isAuthenticated(request);
+export async function getLoggedUser(request: Request, refreshUser = false) {
+  const userFromCookies = await authenticator.isAuthenticated(request);
 
-  if (user instanceof Error) {
+  if (userFromCookies instanceof Error) {
     throw redirect('/login');
   }
 
-  return user;
+  if (refreshUser && userFromCookies) {
+    return await db.user.findUnique({ where: { id: userFromCookies.id } });
+  }
+
+  return userFromCookies;
 }
 
 /**
  * @param request
- * @param refreshUser - load the user from the database to get the latest data
  * @returns user
  */
 export async function requireUser(request: Request) {
-  const user = await authenticator.isAuthenticated(request, { failureRedirect: '/login' });
+  const userFromCookies = await authenticator.isAuthenticated(request, { failureRedirect: '/login' });
 
-  if (user instanceof Error || !user) {
+  if (userFromCookies instanceof Error || !userFromCookies) {
+    throw redirect('/login');
+  }
+
+  // always check user in DB to get the latest data for access control
+  const user = await db.user.findUnique({ where: { id: userFromCookies.id } });
+
+  if (!user) {
     throw redirect('/login');
   }
 

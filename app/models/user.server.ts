@@ -14,10 +14,15 @@ export async function getUserByEmail(email: string) {
 
 export async function createUser(email: string, password: string) {
   const hashedPassword = await bcrypt.hash(password, 10);
+  // check if at least one user exists in db
+  const users = await db.user.findMany({ take: 1 });
+  const isFirstUser = users.length === 0;
+
   const user = await db.user.create({
     data: {
       email,
       password: hashedPassword,
+      editor: isFirstUser ? true : false,
     },
   });
 

@@ -19,7 +19,8 @@ model User {
   password  String
   name      String?
   editor   Boolean  @default(false)
-  progress  UserProgress[]
+  words     WordProgress[]
+  topics    TopicProgress[]
   studySessions StudySession[]
 }
 
@@ -27,28 +28,33 @@ model Word {
   id          Int      @id @default(autoincrement()) @db.UnsignedInt
   word        String?  @db.VarChar(255)
   translation String?  @db.VarChar(255)
-  languageSource    String?  @db.VarChar(2) @default("tr")
-  languageTarget    String?  @db.VarChar(2) @default("ru")
   topic_id    Int?     @db.UnsignedInt
   images      Images[]
-  progress    UserProgress[]
+  progress    WordProgress[]
   topic       Topic?   @relation(fields: [topic_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Word_topic_id_fkey")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([topic_id], map: "topic_id")
   // unique index for word,  topic and language pair
-  @@unique([word, topic_id, languageSource, languageTarget], map: "word_topic_languageSource_languageTarget")
+  @@unique([word, topic_id] , map: "word_topic_id")
 }
 
 model Topic {
   id     Int      @id @default(autoincrement()) @db.UnsignedInt
-  name   String?  @db.VarChar(255) @unique
-  difficulty Int?     @db.UnsignedInt @default(0)
+  name   String @db.VarChar(255)
+  difficulty Int     @db.UnsignedInt @default(0)
+  languageSource    String  @db.VarChar(2) @default("tr")
+  languageTarget    String  @db.VarChar(2) @default("ru")
   words  Word[]
+  progress TopicProgress[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, languageSource, languageTarget], map: "name_languageSource_languageTarget")
 }
 
-model UserProgress {
+model WordProgress {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   user_id   Int     @db.UnsignedInt
   word_id   Int     @db.UnsignedInt
@@ -66,6 +72,22 @@ model UserProgress {
   @@index([user_id], map: "user_id")
   @@index([word_id], map: "word_id")
   @@index([user_id, word_id, direction], map: "user_id_word_id_direction")
+}
+
+model TopicProgress {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  user_id   Int     @db.UnsignedInt
+  topic_id  Int     @db.UnsignedInt
+  completed Boolean @default(false)
+  started  Boolean @default(false)
+  user      User?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "TopicProgress_user_id_fkey")
+  topic     Topic?   @relation(fields: [topic_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "TopicProgress_topic_id_fkey")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([user_id], map: "user_id")
+  @@index([topic_id], map: "topic_id")
+  @@index([user_id, topic_id], map: "user_id_topic_id")
 }
 
 // keep stats about user study sessions per day

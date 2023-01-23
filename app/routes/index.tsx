@@ -1,34 +1,22 @@
-import { Link, useLoaderData } from '@remix-run/react';
-
-import { requireUser } from '~/utils/auth.server';
-
-import type { LoaderArgs } from '@remix-run/node';
-import { db } from '~/utils/db.server';
+import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import type { Topic } from '@prisma/client';
-import { Box, Button, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Link, useLoaderData } from '@remix-run/react';
+import { requireUser } from '~/utils/auth.server';
+import { db } from '~/utils/db.server';
+import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-
-// import topicsCss from '~/styles/topics.css';
 import { styled } from '@mui/system';
-
-// export function links() {
-//   return [{ rel: 'stylesheet', href: topicsCss }];
-// }
-
-type TopicInfo = Topic & { languageSource: string; wordsCount: number };
+import type { TopicInfo } from '~/models/topics.server';
+import { getTopics } from '~/models/topics.server';
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
   // get topics from db and group them by language source
-  const topics = await db.$queryRaw<TopicInfo[]>`
-  SELECT t.name, t.difficulty, w.languageSource, COUNT(w.id) as wordsCount
-  FROM Topic t
-  JOIN Word  w ON t.id = w.topic_id
-  GROUP BY t.name, w.languageSource, t.difficulty
-  ORDER BY w.languageSource Desc, t.difficulty ASC
-  `;
+  const topics = await getTopics(user.id);
+
+  console.log('topics', topics);
 
   // get unique language sources from these topics
   const languages = [...new Set(topics.map((topic) => topic.languageSource))];
@@ -50,7 +38,7 @@ export default function Index() {
             <ul>
               <ListTopics
                 language={language}
-                topics={data.topics.filter((topic) => topic.languageSource === language)}
+                topics={data?.topics.filter((topic) => topic.languageSource === language)}
               />
             </ul>
           </div>
@@ -82,7 +70,7 @@ const StyledLink = styled(Link)({
   color: 'white',
 });
 
-function ListTopics({ topics, language }: { topics: TopicInfo[]; language: string }) {
+function ListTopics({ topics, language }: { topics: SerializeFrom<TopicInfo>[]; language: string }) {
   return (
     <List sx={{ width: '100%' }}>
       {topics.map((topic) => {
@@ -93,7 +81,11 @@ function ListTopics({ topics, language }: { topics: TopicInfo[]; language: strin
                 <Typography sx={{ fontWeight: 'bold' }}>{topic.name} </Typography>({topic.wordsCount} words)
               </ListItemText>
               <ListItemIcon>
-                <CheckBoxOutlineBlankIcon sx={{ color: 'white' }} />
+                {topic.completed ? (
+                  <CheckBoxIcon sx={{ color: 'white' }} />
+                ) : (
+                  <CheckBoxOutlineBlankIcon sx={{ color: 'white' }} />
+                )}
               </ListItemIcon>
             </ListStyled>
           </StyledLink>
