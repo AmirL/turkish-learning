@@ -1,0 +1,17 @@
+/* small font size for table with "format-example" class */
+.format-example th,
+.format-example td {
+  font-size: 11px;
+}
+
+/* style "format-example" table as an example block with background color */
+.format-example {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+/* style "preview" table rows with odd and even background colors */
+.preview tr:nth-child(odd) {
+  background-color: #f5f5f5;
+}

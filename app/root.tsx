@@ -8,7 +8,7 @@ import { unstable_useEnhancedEffect as useEnhancedEffect } from '@mui/material';
 import ClientStyleContext from '~/mui/ClientStyleContext';
 import { useContext } from 'react';
 import Layout from '~/components/Layout';
-import mainStyle from '~/layout.css';
+import mainStyle from '~/css/layout.css';
 import { getLoggedUser } from './utils/auth.server';
 
 export const meta: MetaFunction = () => ({

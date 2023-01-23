@@ -25,61 +25,74 @@ model User {
 
 model Word {
   id          Int      @id @default(autoincrement()) @db.UnsignedInt
-  word        String?  @db.VarChar(255) @unique
+  word        String?  @db.VarChar(255)
   translation String?  @db.VarChar(255)
   languageSource    String?  @db.VarChar(2) @default("tr")
   languageTarget    String?  @db.VarChar(2) @default("ru")
-  topicId    Int?     @db.UnsignedInt
+  topic_id    Int?     @db.UnsignedInt
   images      Images[]
   progress    UserProgress[]
-  topic       Topic?   @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Word_topicId_fkey")
+  topic       Topic?   @relation(fields: [topic_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Word_topic_id_fkey")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([topicId], map: "topicId")
+  @@index([topic_id], map: "topic_id")
+  // unique index for word,  topic and language pair
+  @@unique([word, topic_id, languageSource, languageTarget], map: "word_topic_languageSource_languageTarget")
 }
 
 model Topic {
   id     Int      @id @default(autoincrement()) @db.UnsignedInt
   name   String?  @db.VarChar(255) @unique
+  difficulty Int?     @db.UnsignedInt @default(0)
   words  Word[]
 }
 
 model UserProgress {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId   Int     @db.UnsignedInt
-  wordId   Int     @db.UnsignedInt
+  user_id   Int     @db.UnsignedInt
+  word_id   Int     @db.UnsignedInt
   level  Int     @db.UnsignedInt @default(0)
+  direction Boolean @default(true) // true - source to target, false - target to source
   nextReview DateTime?
   correct     Int     @db.UnsignedInt @default(0)
   wrong       Int     @db.UnsignedInt @default(0)
   views      Int     @db.UnsignedInt @default(0)
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "UserProgress_userId_fkey")
-  word      Word?    @relation(fields: [wordId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "UserProgress_wordId_fkey")
+  user      User?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "UserProgress_user_id_fkey")
+  word      Word?    @relation(fields: [word_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "UserProgress_word_id_fkey")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([userId], map: "userId")
-  @@index([wordId], map: "wordId")
+  @@index([user_id], map: "user_id")
+  @@index([word_id], map: "word_id")
+  @@index([user_id, word_id, direction], map: "user_id_word_id_direction")
 }
 
 // keep stats about user study sessions per day
 model StudySession {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId   Int     @db.UnsignedInt
+  user_id   Int     @db.UnsignedInt
   date      DateTime @default(now())
   words     Int     @db.UnsignedInt @default(0)
   correct  Int    @db.UnsignedInt @default(0)
   wrong     Int     @db.UnsignedInt @default(0)
   known     Int     @db.UnsignedInt @default(0)
   shown     Int     @db.UnsignedInt @default(0)
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "StudySession_userId_fkey")
+  user      User?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "StudySession_user_id_fkey")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([userId], map: "userId")
+  @@index([user_id], map: "user_id")
 }
 
 model Images {
   id       Int      @id @default(autoincrement()) @db.UnsignedInt
-  wordId  Int     @db.UnsignedInt
+  word_id  Int     @db.UnsignedInt
   link     String  @db.VarChar(500)
-  selected Boolean @default(false)
-  word     Word?    @relation(fields: [wordId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Images_wordId_fkey")
+  isSelected Boolean @default(false)
+  word     Word?    @relation(fields: [word_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Images_word_id_fkey")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([wordId], map: "wordId")
+  @@index([word_id], map: "word_id")
 }

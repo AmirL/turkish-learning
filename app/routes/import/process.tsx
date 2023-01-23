@@ -46,7 +46,7 @@ export const action: ActionFunction = async ({ request }) => {
       translation: row.translation,
       languageSource: row.languageSource,
       languageTarget: row.languageTarget,
-      topicId: topicsIds[row.topic],
+      topic_id: topicsIds[row.topic],
     };
   });
 

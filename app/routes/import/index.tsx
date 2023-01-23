@@ -9,6 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 
 import { invariant } from '@remix-run/router';
 import Papa from 'papaparse';
+import style from '~/css/importCsv.css';
+
+export function links() {
+  return [{ rel: 'stylesheet', href: style }];
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireUser(request);
@@ -110,18 +115,21 @@ function PreviewImportForm({ table }: { table: Row[] }) {
   );
 }
 
-function PreviewImportedData({ table }: { table: Row[] }) {
+function PreviewTable({ table }: { table: Row[] }) {
+  // show topic, languageSource, languageTarget before the table
+  // and render the table without these columns
+  const { topic, languageSource, languageTarget } = table[0];
+
   return (
-    <>
-      <h2>Preview</h2>
-      <Table>
+    <Box sx={{ mb: 10 }}>
+      <Typography variant="h4">
+        {topic} {languageSource} - {languageTarget}
+      </Typography>
+      <Table stickyHeader className="preview">
         <TableHead>
           <TableRow>
             <TableCell>word</TableCell>
             <TableCell>translation</TableCell>
-            <TableCell>languageSource</TableCell>
-            <TableCell>languageTarget</TableCell>
-            <TableCell>topic</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -129,13 +137,31 @@ function PreviewImportedData({ table }: { table: Row[] }) {
             <TableRow key={index}>
               <TableCell>{row.word}</TableCell>
               <TableCell>{row.translation}</TableCell>
-              <TableCell>{row.languageSource}</TableCell>
-              <TableCell>{row.languageTarget}</TableCell>
-              <TableCell>{row.topic}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+    </Box>
+  );
+}
+
+function PreviewImportedData({ table }: { table: Row[] }) {
+  // group rows by topic, languageSource, languageTarget
+  const grouped = table.reduce((acc, row) => {
+    const key = `${row.topic}-${row.languageSource}-${row.languageTarget}`;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(row);
+    return acc;
+  }, {} as Record<string, Row[]>);
+
+  // render table for each group
+  return (
+    <>
+      {Object.entries(grouped).map(([key, rows]) => (
+        <PreviewTable key={key} table={rows} />
+      ))}
     </>
   );
 }
@@ -144,7 +170,7 @@ function CsvTableExample() {
   return (
     <>
       <Typography variant="subtitle2">The CSV file should have the following format:</Typography>
-      <Table>
+      <Table className="format-example" size="small">
         <TableHead>
           <TableRow>
             <TableCell>word</TableCell>
