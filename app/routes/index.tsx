@@ -23,11 +23,11 @@ export async function loader({ request }: LoaderArgs) {
 
   // get topics from db and group them by language source
   const topics = await db.$queryRaw<TopicInfo[]>`
-  SELECT topic.*, languageSource, COUNT(word.id) as wordsCount
-  FROM topic
-  JOIN word ON topic.id = word.topic_id
-  GROUP BY topic.name, word.languageSource
-  ORDER BY word.languageSource Desc, topic.difficulty ASC
+  SELECT t.name, t.difficulty, w.languageSource, COUNT(w.id) as wordsCount
+  FROM Topic t
+  JOIN Word  w ON t.id = w.topic_id
+  GROUP BY t.name, w.languageSource, t.difficulty
+  ORDER BY w.languageSource Desc, t.difficulty ASC
   `;
 
   // get unique language sources from these topics
