@@ -2,10 +2,10 @@
 export function getLanguageLabel(language: string) {
   switch (language) {
     case 'en':
-      return 'English';
+      return '🇬🇧 English';
     case 'tr':
-      return 'Turkish';
+      return '🇹🇷 Turkish';
     case 'ru':
-      return 'Russian';
+      return '🇷🇺 Russian';
   }
 }

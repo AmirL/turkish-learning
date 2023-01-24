@@ -22,7 +22,8 @@ export async function createUser(email: string, password: string) {
     data: {
       email,
       password: hashedPassword,
-      editor: isFirstUser ? true : false,
+      isEditor: isFirstUser ? true : false,
+      isAdmin: isFirstUser ? true : false,
     },
   });
 

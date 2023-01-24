@@ -18,7 +18,7 @@ function IsRowType(row: any): row is Row {
 export const action: ActionFunction = async ({ request }) => {
   const user = await requireUser(request);
 
-  invariant(user.editor === true, 'Only editors can import words');
+  invariant(user.isEditor === true, 'Only editors can import words');
 
   const form = await request.formData();
 

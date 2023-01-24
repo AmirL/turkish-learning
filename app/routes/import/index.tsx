@@ -17,7 +17,7 @@ export function links() {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireUser(request);
-  if (user.editor === false) {
+  if (user.isEditor === false) {
     return redirect('/');
   }
 
@@ -35,7 +35,7 @@ export type Row = {
 export const action: LoaderFunction = async ({ request }) => {
   const user = await requireUser(request);
 
-  invariant(user.editor === true, 'Only editors can import words');
+  invariant(user.isEditor === true, 'Only editors can import words');
 
   const form = await request.formData();
   const file = form.get('file') as File;

@@ -13,12 +13,13 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   email     String   @unique
   password  String
   name      String?
-  editor   Boolean  @default(false)
+  isEditor   Boolean  @default(false)
+  isAdmin    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   words     WordProgress[]
   topics    TopicProgress[]
   studySessions StudySession[]
@@ -26,9 +27,9 @@ model User {
 
 model Word {
   id          Int      @id @default(autoincrement()) @db.UnsignedInt
-  word        String?  @db.VarChar(255)
-  translation String?  @db.VarChar(255)
-  topic_id    Int?     @db.UnsignedInt
+  word        String  @db.VarChar(255)
+  translation String  @db.VarChar(255)
+  topic_id    Int     @db.UnsignedInt
   images      Images[]
   progress    WordProgress[]
   topic       Topic?   @relation(fields: [topic_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Word_topic_id_fkey")
@@ -58,12 +59,12 @@ model WordProgress {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   user_id   Int     @db.UnsignedInt
   word_id   Int     @db.UnsignedInt
-  level  Int     @db.UnsignedInt @default(0)
-  direction Boolean @default(true) // true - source to target, false - target to source
-  nextReview DateTime?
-  correct     Int     @db.UnsignedInt @default(0)
-  wrong       Int     @db.UnsignedInt @default(0)
-  views      Int     @db.UnsignedInt @default(0)
+  level  Int     @db.UnsignedInt @default(0) // level of knowledge for the word
+  isReversed Boolean @default(false) // is the word reversed in the study session
+  nextReview DateTime? // next review date
+  correct     Int     @db.UnsignedInt @default(0) // number of correct answers
+  wrong       Int     @db.UnsignedInt @default(0) // number of wrong answers
+  views      Int     @db.UnsignedInt @default(0) // number of times the word was shown
   user      User?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "UserProgress_user_id_fkey")
   word      Word?    @relation(fields: [word_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "UserProgress_word_id_fkey")
   createdAt DateTime @default(now())
@@ -71,7 +72,7 @@ model WordProgress {
 
   @@index([user_id], map: "user_id")
   @@index([word_id], map: "word_id")
-  @@index([user_id, word_id, direction], map: "user_id_word_id_direction")
+  @@index([user_id, word_id, isReversed], map: "user_id_word_id_isReversed")
 }
 
 model TopicProgress {

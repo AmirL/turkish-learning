@@ -18,7 +18,7 @@ export default function Layout({ children, user = null }: { children: React.Reac
   ];
 
   // remove import tab for non editors
-  if (user && user.editor === false) {
+  if (user && user.isEditor === false) {
     navBar.splice(1, 1);
   }
 
