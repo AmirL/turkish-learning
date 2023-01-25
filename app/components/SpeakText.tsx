@@ -18,16 +18,21 @@ export function InitSpeech() {
   });
 }
 
-const getLanguage = (name: string, lang: string) => {
+const getLanguage = (names: string[], lang: string) => {
   const voices = window.speechSynthesis.getVoices();
-  if (name > '') {
-    const findByName = voices.find((voice) => voice.name.includes(name));
-    if (findByName) return findByName;
+  const voicesFiltered = voices.filter((voice) => voice.lang.startsWith(lang));
+
+  console.log('Voices for', lang, voicesFiltered);
+
+  if (names.length > 0) {
+    for (const name of names) {
+      const findByName = voicesFiltered.find((voice) => voice.voiceURI.includes(name));
+      if (findByName) return findByName;
+    }
   }
 
-  if (lang > '') {
-    const findByLang = voices.find((voice) => voice.lang.includes(lang));
-    if (findByLang) return findByLang;
+  if (voicesFiltered.length > 0) {
+    return voicesFiltered[0];
   }
 
   return null;
@@ -46,20 +51,22 @@ export function SpeakText(text: string, language: string) {
 
   const msg = msgSource.get(language);
   if (msg && (!lastMsg || lastMsg.text !== text)) {
+    speechSynthesis.cancel();
     msg.text = text;
     switch (language) {
       case 'ru':
-        // msg.voice = getLanguage('Google русский', '');
+        // msg.voice = getLanguage(['US.Samantha'], 'en');
         msg.lang = 'ru';
         msg.volume = 0.8;
         break;
       case 'tr':
-        msg.voice = getLanguage('', 'tr-TR');
+        msg.voice = getLanguage([], language);
         msg.volume = 1;
         break;
       case 'en':
-        msg.voice = getLanguage('Google US English', 'en-US');
-        msg.volume = 1;
+        msg.voice = getLanguage(['Karen', 'Daniel', 'US.Samantha'], language);
+        console.log(msg.voice);
+        msg.volume = 0.8;
         break;
     }
     lastMsg = msg;
