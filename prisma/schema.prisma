@@ -15,7 +15,8 @@ model User {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   email     String   @unique
   password  String
-  name      String?
+  name      String
+  avatar    String @db.MediumText
   isEditor   Boolean  @default(false)
   isAdmin    Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -72,7 +73,7 @@ model WordProgress {
 
   @@index([user_id], map: "user_id")
   @@index([word_id], map: "word_id")
-  @@index([user_id, word_id, isReversed], map: "user_id_word_id_isReversed")
+  @@unique([user_id, word_id, isReversed], map: "user_id_word_id_isReversed")
 }
 
 model TopicProgress {
@@ -88,7 +89,7 @@ model TopicProgress {
 
   @@index([user_id], map: "user_id")
   @@index([topic_id], map: "topic_id")
-  @@index([user_id, topic_id], map: "user_id_topic_id")
+  @@unique([user_id, topic_id], map: "user_id_topic_id")
 }
 
 // keep stats about user study sessions per day

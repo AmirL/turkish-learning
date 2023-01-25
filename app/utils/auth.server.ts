@@ -38,18 +38,18 @@ export default authenticator;
  * @param refreshUser - load the user from the database to get the latest data
  * @returns user
  */
-export async function getLoggedUser(request: Request, refreshUser = false) {
+export async function getLoggedUser(request: Request) {
   const userFromCookies = await authenticator.isAuthenticated(request);
 
   if (userFromCookies instanceof Error) {
     throw redirect('/login');
   }
 
-  if (refreshUser && userFromCookies) {
+  if (userFromCookies) {
     return await db.user.findUnique({ where: { id: userFromCookies.id } });
   }
 
-  return userFromCookies;
+  return null;
 }
 
 /**
@@ -76,9 +76,24 @@ export async function requireUser(request: Request) {
 export async function login(user: User, request: Request, redirectTo: FormDataEntryValue | null) {
   let session = await sessionStorage.getSession(request.headers.get('Cookie'));
 
+  // don't store avatar in session
+  user.avatar = '';
+
   session.set(authenticator.sessionKey, user);
   session.set(authenticator.sessionStrategyKey, 'form');
   return redirect(typeof redirectTo === 'string' ? redirectTo : '/', {
     headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
   });
 }
+
+// export async function updateUserSession(user: User, request: Request) {
+//   let session = await sessionStorage.getSession(request.headers.get('Cookie'));
+
+//   // don't store avatar in session
+//   user.avatar = '';
+
+//   session.set(authenticator.sessionKey, user);
+//   return redirect('/profile', {
+//     headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
+//   });
+// }

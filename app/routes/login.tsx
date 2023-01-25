@@ -8,7 +8,7 @@ import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getLoggedUser(request, true);
+  const user = await getLoggedUser(request);
   if (user) return redirect('/');
 
   return json({});

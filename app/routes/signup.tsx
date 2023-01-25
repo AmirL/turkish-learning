@@ -9,19 +9,25 @@ import { badRequest } from '~/utils/request.server';
 import { getLoggedUser, login } from '~/utils/auth.server';
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getLoggedUser(request, true);
+  const user = await getLoggedUser(request);
   if (user) return redirect('/');
   return json({});
 };
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
+  const name = formData.get('name');
   const email = formData.get('email');
   const password = formData.get('password');
   const confirmPassword = formData.get('confirmPassword');
   const redirectTo = formData.get('redirectTo');
 
-  if (typeof email !== 'string' || typeof password !== 'string' || typeof confirmPassword !== 'string') {
+  if (
+    typeof email !== 'string' ||
+    typeof password !== 'string' ||
+    typeof confirmPassword !== 'string' ||
+    typeof name !== 'string'
+  ) {
     return badRequest({
       fieldErrors: null,
       fields: null,
@@ -34,6 +40,7 @@ export const action: ActionFunction = async ({ request }) => {
     email: validateEmail(email),
     password: validatePassword(password),
     confirmPassword: validateConfirmPassword(password, confirmPassword),
+    name: validateName(name),
   };
 
   if (Object.values(fieldErrors).some((error) => error)) {
@@ -49,7 +56,7 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  const user = await createUser(email, password);
+  const user = await createUser(email, password, name);
   return await login(user, request, redirectTo);
 };
 
@@ -73,6 +80,20 @@ export default function Signup() {
                 {data.formError}
               </Typography>
             ) : null}
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              id="name"
+              variant="outlined"
+              label="Student name"
+              name="name"
+              required
+              fullWidth
+              autoComplete="name"
+              defaultValue={data?.fields?.name}
+              error={!!data?.fieldErrors?.name}
+              helperText={data?.fieldErrors?.name}
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -146,4 +167,9 @@ function validatePassword(password: unknown) {
 function validateConfirmPassword(password: unknown, confirmPassword: unknown) {
   if (typeof confirmPassword !== 'string') return 'Confirm password is required';
   if (password !== confirmPassword) return 'Passwords do not match';
+}
+
+function validateName(name: unknown) {
+  if (typeof name !== 'string') return 'Name is required';
+  if (name.length < 2) return 'Name is too short';
 }

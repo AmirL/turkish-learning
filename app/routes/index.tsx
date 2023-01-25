@@ -1,5 +1,5 @@
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
-import { Link, useLoaderData } from '@remix-run/react';
+import { Link, useLoaderData, useTransition } from '@remix-run/react';
 import { requireUser } from '~/utils/auth.server';
 import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
@@ -23,6 +23,9 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function Index() {
   const data = useLoaderData<typeof loader>();
+  const transtion = useTransition();
+
+  const disabled = transtion.state !== 'idle';
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
@@ -32,9 +35,10 @@ export default function Index() {
           <div key={language}>
             {/* center language source subheader */}
             <h2 style={{ textAlign: 'center' }}>{getLanguageLabel(language)}</h2>
-            <ul>
-              <ListTopics topics={data?.topics.filter((topic) => topic.languageSource === language)} />
-            </ul>
+            <ListTopics
+              topics={data?.topics.filter((topic) => topic.languageSource === language)}
+              disabled={disabled}
+            />
           </div>
         );
       })}
@@ -57,20 +61,37 @@ const ListStyled = styled(ListItem)({
     backgroundColor: '#1976d2',
     borderColor: '#1976d2',
   },
+  // change color if has disabled class
+  '&.disabled': {
+    backgroundColor: '#1976d2',
+    borderColor: '#1976d2',
+    '&:hover': {
+      backgroundColor: '#1976d2',
+      borderColor: '#1976d2',
+    },
+    '&:active': {
+      backgroundColor: '#1976d2',
+      borderColor: '#1976d2',
+    },
+  },
 });
 
 const StyledLink = styled(Link)({
   textDecoration: 'none',
   color: 'white',
+  // disabe pointer icon when has disabled class
+  '&.disabled': {
+    pointerEvents: 'none',
+  },
 });
 
-function ListTopics({ topics }: { topics: SerializeFrom<TopicInfo>[] }) {
+function ListTopics({ topics, disabled }: { topics: SerializeFrom<TopicInfo>[]; disabled: boolean }) {
   return (
-    <List sx={{ width: '100%' }}>
+    <List sx={{ width: '100%' }} className="topics">
       {topics.map((topic) => {
         return (
-          <StyledLink key={topic.id} to={`/topic/${topic.id}`}>
-            <ListStyled sx={{ mb: 1 }}>
+          <StyledLink key={topic.id} to={`/topic/${topic.id}`} className={disabled ? 'disabled' : ''}>
+            <ListStyled sx={{ mb: 1 }} className={disabled ? 'disabled' : ''}>
               <ListItemText>
                 <Typography sx={{ fontWeight: 'bold' }}>{topic.name} </Typography>({topic.wordsCount} words)
               </ListItemText>

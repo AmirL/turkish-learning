@@ -1,11 +1,14 @@
-import { Box, Button, Grid, Stack, Typography } from '@mui/material';
+import { Box, Button, Grid, Paper, Stack, Typography } from '@mui/material';
 import type { SerializeFrom } from '@remix-run/node';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from '@mui/system';
-import type { Word } from '~/models/words.server';
+import type { WordWithProgress } from '~/models/words.server';
+import { SpeakText } from './SpeakText';
 
 type WordCardProps = {
-  word: SerializeFrom<Word>;
+  word: SerializeFrom<WordWithProgress>;
+  languageSource: string;
+  languageTarget: string;
   userAnswerHandler: (correct: boolean) => void;
 };
 
@@ -23,28 +26,29 @@ const RepeatButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
 }));
 
-export function WordCard({ word, userAnswerHandler }: WordCardProps) {
+export function WordCard({ word, userAnswerHandler, languageSource, languageTarget }: WordCardProps) {
   const [flipped, setFlipped] = useState(false);
 
   const text = flipped ? word.translation : word.word;
+  const language = flipped ? languageTarget : languageSource;
 
   function flip() {
     setFlipped((prev) => !prev);
   }
 
+  useEffect(() => {
+    SpeakText(text, language);
+  }, [text, language]);
+
   return (
     <Box>
-      <Grid
-        onClick={flip}
-        sx={{ p: 10 }}
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Typography variant="h2">{text}</Typography>
-      </Grid>
+      <Paper elevation={3} sx={{ p: 5, m: 5, bgcolor: flipped ? '#6B4E90' : '#427A82' }} onClick={flip}>
+        <Grid container justifyContent="center">
+          <Typography variant="h4" alignContent="center" textAlign="center" color="white">
+            {text}
+          </Typography>
+        </Grid>
+      </Paper>
       {flipped ? (
         <Stack spacing={5} direction="row" justifyContent="center">
           <CorrectButton
