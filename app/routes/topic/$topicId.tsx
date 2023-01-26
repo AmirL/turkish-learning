@@ -66,7 +66,7 @@ export default function StudyingTopic() {
         // remove word from words array
         wordsArray.splice(0, 1);
       } else {
-        const step = (currentWord.level + 1) ** 2;
+        const step = Math.floor(currentWord.level ** 1.6);
         // move word forward depending on level
         arrayMoveMutable(wordsArray, 0, step);
       }
