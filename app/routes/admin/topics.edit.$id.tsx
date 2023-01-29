@@ -1,5 +1,5 @@
 import { Alert, Box, Button, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import { json } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
 import { invariant } from '@remix-run/router';
@@ -46,6 +46,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   if (typeof name !== 'string' || typeof languageSource !== 'string' || typeof languageTarget !== 'string') {
     return badRequest({ error: 'Invalid form data', success: false });
+  }
+
+  const intent = formData.get('intent');
+
+  if (intent === 'delete') {
+    await db.topic.delete({
+      where: { id: Number(params.id) },
+    });
+    return redirect('/admin/topics');
   }
 
   await db.topic.update({
@@ -103,8 +112,11 @@ export default function EditUser() {
             </Select>
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" type="submit">
+            <Button variant="contained" type="submit" name="intent" value="update">
               Update
+            </Button>
+            <Button variant="contained" type="submit" name="intent" value="delete" color="error" sx={{ ml: 2 }}>
+              Delete
             </Button>
           </Grid>
         </Grid>

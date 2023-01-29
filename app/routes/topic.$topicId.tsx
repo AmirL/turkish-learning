@@ -137,16 +137,6 @@ export default function StudyingTopic() {
           />
         </>
       )}
-      {/* link to delete the topic for editors. Post form to prevent csrf attacks */}
-      {user.isAdmin ? (
-        <Box sx={{ mt: 15 }}>
-          <Form method="post" action={`/topic/delete/${topic.id}`}>
-            <Button variant="contained" color="error" type="submit">
-              Delete topic
-            </Button>
-          </Form>
-        </Box>
-      ) : null}
     </Box>
   );
 }
