@@ -69,11 +69,11 @@ export default function Signup() {
   const submitText = transition.state !== 'idle' ? 'Signing up...' : 'Sign Up';
 
   return (
-    <Box sx={{ textAlign: 'center' }} maxWidth="xs">
+    <Box sx={{ textAlign: 'center', width: '100%' }} maxWidth="xs">
       <h1>Sign Up</h1>
       <Form method="post">
         {/* Grid to style signup form */}
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} xs={12}>
           <Grid item xs={12}>
             {data?.formError ? (
               <Typography color="error" sx={{ textAlign: 'left' }}>

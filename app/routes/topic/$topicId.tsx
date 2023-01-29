@@ -1,6 +1,6 @@
 import { Box, Button, LinearProgress } from '@mui/material';
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
-import { Link, useFetcher, useLoaderData, useRevalidator } from '@remix-run/react';
+import { Form, Link, useFetcher, useLoaderData, useRevalidator } from '@remix-run/react';
 import { db } from '~/utils/db.server';
 import { invariant } from '@remix-run/router';
 import { getLanguageLabel } from '~/utils/strings';
@@ -37,6 +37,7 @@ export async function loader({ request, params }: LoaderArgs) {
   const wordToStudy = words.filter((word) => word.level < 5);
 
   return {
+    user,
     totalWords,
     topic,
     words: wordToStudy,
@@ -48,7 +49,7 @@ const H1Styled = styled.h1`
 `;
 
 export default function StudyingTopic() {
-  const { topic, words, totalWords } = useLoaderData<typeof loader>();
+  const { topic, words, totalWords, user } = useLoaderData<typeof loader>();
 
   const [currentWord, setCurrentWord] = useState<Word>(words[0]);
   const [wordsArray, setWordsArray] = useState<Word[]>(words);
@@ -136,6 +137,16 @@ export default function StudyingTopic() {
           />
         </>
       )}
+      {/* link to delete the topic for editors. Post form to prevent csrf attacks */}
+      {user.isAdmin ? (
+        <Box sx={{ mt: 15 }}>
+          <Form method="post" action={`/topic/delete/${topic.id}`}>
+            <Button variant="contained" color="error" type="submit">
+              Delete topic
+            </Button>
+          </Form>
+        </Box>
+      ) : null}
     </Box>
   );
 }

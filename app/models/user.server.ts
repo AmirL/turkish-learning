@@ -32,8 +32,12 @@ async function generateRandomAvatarImage() {
   return (await avatarResponse.text()) ?? '';
 }
 
+export async function hashPassword(password: string) {
+  return bcrypt.hash(password, 10);
+}
+
 export async function createUser(email: string, password: string, name: string) {
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
   // check if at least one user exists in db
   const users = await db.user.findMany({ take: 1 });
   const isFirstUser = users.length === 0;

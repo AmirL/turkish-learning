@@ -1,7 +1,7 @@
 /* @file Form to import words from a CSV file. Only for editors */
 import { Button, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import type { LoaderFunction } from '@remix-run/node';
+import type { ActionArgs, ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
 import { Form, useActionData, useTransition } from '@remix-run/react';
 import { requireUser } from '~/utils/auth.server';
@@ -32,7 +32,7 @@ export type Row = {
   topic: string;
 };
 
-export const action: LoaderFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request }: ActionArgs) => {
   const user = await requireUser(request);
 
   invariant(user.isEditor === true, 'Only editors can import words');
