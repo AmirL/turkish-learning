@@ -17,7 +17,7 @@ export default function Layout({ children, user = null }: { children: React.Reac
 
   return (
     <Container maxWidth="sm">
-      <Paper sx={{ position: 'fixed', top: 0, left: 0, right: 0 }} elevation={3}>
+      <Paper sx={{ position: 'fixed', top: 0, left: 0, right: 0, backgroundColor: 'white', zIndex: 100 }} elevation={3}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, pb: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <img src="/logo.png" alt="logo" width="50" height="50" />

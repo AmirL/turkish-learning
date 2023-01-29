@@ -16,6 +16,8 @@ export async function loader({ request }: LoaderArgs) {
 export default function AdminActions() {
   const links = [
     { label: 'Users', link: '/admin/users' },
+    { label: 'Topics', link: '/admin/topics' },
+    { label: 'Words', link: '/admin/words' },
     { label: 'Import', link: '/import' },
   ];
   return (
@@ -24,7 +26,9 @@ export default function AdminActions() {
       <Stack spacing={2} direction="column" sx={{ width: '100%' }}>
         {links.map((link) => (
           <Link to={link.link} key={link.link}>
-            <Button variant="contained">{link.label}</Button>
+            <Button fullWidth variant="contained">
+              {link.label}
+            </Button>
           </Link>
         ))}
       </Stack>

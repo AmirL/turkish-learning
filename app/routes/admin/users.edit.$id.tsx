@@ -1,9 +1,10 @@
 // @file edit user form by admin
 
 import { Alert, Box, Button, Grid, TextField } from '@mui/material';
-import { json, redirect } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
-import { ActionFunctionArgs, invariant, LoaderFunctionArgs } from '@remix-run/router';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
+import { invariant } from '@remix-run/router';
 import UserAvatar from '~/components/UserAvatar';
 import { hashPassword } from '~/models/user.server';
 
