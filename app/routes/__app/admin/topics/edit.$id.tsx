@@ -1,8 +1,20 @@
-import { Alert, Box, Button, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from '@mui/material';
 import { json, redirect } from '@remix-run/node';
 import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
 import { invariant } from '@remix-run/router';
+import CloseDialogButton from '~/components/CloseDialogButton';
 
 import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
@@ -76,52 +88,52 @@ export default function EditUser() {
   ];
 
   return (
-    <Box sx={{ textAlign: 'center' }} maxWidth="xs">
-      <h2>Edit Topic {topic.name}</h2>
-      <Form method="post">
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            {data?.success ? <Alert severity="success">Topic updated successfully</Alert> : null}
-            {data?.error ? <Alert severity="error">{data.error}</Alert> : null}
+    <>
+      <DialogTitle>Edit Topic {topic.name}</DialogTitle>
+      <DialogContent sx={{ textAlign: 'center' }}>
+        <Form method="post">
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              {data?.success ? <Alert severity="success">Topic updated successfully</Alert> : null}
+              {data?.error ? <Alert severity="error">{data.error}</Alert> : null}
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="name" name="name" defaultValue={topic.name} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <InputLabel id="languageSource">Source Language</InputLabel>
+              <Select label="languageSource" name="languageSource" defaultValue={topic.languageSource} fullWidth>
+                {languages.map((language) => (
+                  <MenuItem key={language.value} value={language.value}>
+                    {language.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item xs={12}>
+              <InputLabel id="languageTarget">Target Language</InputLabel>
+              <Select label="languageTarget" name="languageTarget" defaultValue={topic.languageTarget} fullWidth>
+                {languages.map((language) => (
+                  <MenuItem key={language.value} value={language.value}>
+                    {language.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" type="submit" name="intent" value="update">
+                Update
+              </Button>
+              <Button variant="contained" type="submit" name="intent" value="delete" color="error" sx={{ ml: 2 }}>
+                Delete
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <TextField label="name" name="name" defaultValue={topic.name} fullWidth />
-          </Grid>
-          <Grid item xs={12}>
-            <InputLabel id="languageSource">Source Language</InputLabel>
-            <Select label="languageSource" name="languageSource" defaultValue={topic.languageSource} fullWidth>
-              {languages.map((language) => (
-                <MenuItem key={language.value} value={language.value}>
-                  {language.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </Grid>
-          <Grid item xs={12}>
-            <InputLabel id="languageTarget">Target Language</InputLabel>
-            <Select label="languageTarget" name="languageTarget" defaultValue={topic.languageTarget} fullWidth>
-              {languages.map((language) => (
-                <MenuItem key={language.value} value={language.value}>
-                  {language.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" type="submit" name="intent" value="update">
-              Update
-            </Button>
-            <Button variant="contained" type="submit" name="intent" value="delete" color="error" sx={{ ml: 2 }}>
-              Delete
-            </Button>
-          </Grid>
-        </Grid>
-      </Form>
-      <Link to="/admin/topics">
-        <Button variant="contained" sx={{ mt: 10 }} color="secondary">
-          Back to topics
-        </Button>
-      </Link>
-    </Box>
+        </Form>
+        <Link to="/admin/topics">
+          <CloseDialogButton />
+        </Link>
+      </DialogContent>
+    </>
   );
 }

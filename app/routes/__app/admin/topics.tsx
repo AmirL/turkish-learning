@@ -1,8 +1,10 @@
-// @file  list of all words with pagination, and search by word
+// @file  list of all topics with pagination, and search by name
 
-import { Box, Pagination, Table, TextField } from '@mui/material';
+import { Box, Dialog, Pagination, Table, TextField } from '@mui/material';
 import type { LoaderArgs } from '@remix-run/node';
-import { Form, Link, useLoaderData, useSearchParams } from '@remix-run/react';
+import { Form, Link, useLoaderData, useOutlet, useSearchParams } from '@remix-run/react';
+import { invariant } from '@remix-run/router';
+import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
 
 import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
@@ -20,37 +22,27 @@ export async function loader({ request }: LoaderArgs) {
   const where =
     search.length > 0
       ? {
-          OR: [
-            {
-              word: {
-                contains: search,
-              },
-            },
-            {
-              translation: {
-                contains: search,
-              },
-            },
-          ],
+          name: {
+            contains: search,
+          },
         }
       : undefined;
 
-  const pages = Math.floor((await db.word.count({ where })) / perPage) + 1;
+  const pages = Math.floor((await db.topic.count({ where })) / perPage) + 1;
 
-  const words = await db.word.findMany({
+  const topics = await db.topic.findMany({
     where,
-    include: { topic: true },
     skip: page * perPage,
     take: perPage,
     orderBy: { createdAt: 'desc' },
   });
 
-  return { words, pages, page, status: 200 };
+  return { topics, pages, page, status: 200 };
 }
 
 export default function AdminUsers() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { words, pages, page } = useLoaderData<typeof loader>();
+  const { topics, pages, page } = useLoaderData<typeof loader>();
 
   const onPageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     const page = (value - 1).toString();
@@ -63,9 +55,10 @@ export default function AdminUsers() {
     timeStyle: 'short',
   });
 
+  const outlet = useOutlet();
+
   return (
     <>
-      <h2>Words</h2>
       <Box sx={{ mb: 3 }}>
         <Form method="get">
           <TextField label="Search" name="search" fullWidth defaultValue={searchParams.get('search')} />
@@ -76,36 +69,28 @@ export default function AdminUsers() {
         <TableHead>
           <TableRow>
             <TableCell> </TableCell>
-            <TableCell>Word</TableCell>
-            <TableCell>Translation</TableCell>
-            <TableCell>Topic</TableCell>
+            <TableCell>Title</TableCell>
+            <TableCell>Language Source</TableCell>
+            <TableCell>Language Target</TableCell>
             <TableCell>Created At</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {words.map((word) => (
-            <TableRow key={word.id}>
+          {topics.map((topic) => (
+            <TableRow key={topic.id}>
               <TableCell>
-                <Link to={`/admin/words/edit/${word.id}`}>
+                <Link to={`/admin/topics/edit/${topic.id}`}>
                   <EditIcon color="primary" />
                 </Link>
               </TableCell>
-              <TableCell>{word.word}</TableCell>
-              <TableCell>{word.translation}</TableCell>
-              <TableCell>
-                {word.topic ? (
-                  <Box>
-                    {word.topic.name}
-                    <br /> {getLanguageLabel(word.topic.languageSource)}
-                    {' → '}
-                    {getLanguageLabel(word.topic.languageTarget)}
-                  </Box>
-                ) : null}
-              </TableCell>
-              <TableCell>{dateFormatter.format(new Date(word.createdAt))}</TableCell>
+              <TableCell>{topic.name}</TableCell>
+              <TableCell>{getLanguageLabel(topic.languageSource)}</TableCell>
+              <TableCell>{getLanguageLabel(topic.languageTarget)}</TableCell>
+              <TableCell>{dateFormatter.format(new Date(topic.createdAt))}</TableCell>
             </TableRow>
           ))}
         </TableBody>
+        <Dialog open={Boolean(outlet)}>{outlet}</Dialog>
       </Table>
     </>
   );

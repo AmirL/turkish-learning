@@ -1,8 +1,9 @@
-import { Alert, Box, Button, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material';
 import { json, redirect } from '@remix-run/node';
 import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
 import { invariant } from '@remix-run/router';
+import CloseDialogButton from '~/components/CloseDialogButton';
 
 import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
@@ -71,44 +72,44 @@ export default function EditUser() {
   const data = useActionData<typeof action>();
 
   return (
-    <Box sx={{ textAlign: 'center' }} maxWidth="xs">
-      <h1>Edit Word: {word.word}</h1>
-      <Form method="post">
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            {data?.success ? <Alert severity="success">Word updated successfully</Alert> : null}
-            {data?.error ? <Alert severity="error">{data.error}</Alert> : null}
-          </Grid>
-          {word.topic ? (
+    <>
+      <DialogTitle>Edit Word: {word.word}</DialogTitle>
+      <DialogContent sx={{ textAlign: 'center' }}>
+        <Form method="post">
+          <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography variant="h6">
-                {word.topic.name}
-                {word.topic.languageSource ? ` ${getLanguageLabel(word.topic.languageSource)}` : null} &rarr;{' '}
-                {word.topic.languageTarget ? ` ${getLanguageLabel(word.topic.languageTarget)}` : null}
-              </Typography>
+              {data?.success ? <Alert severity="success">Word updated successfully</Alert> : null}
+              {data?.error ? <Alert severity="error">{data.error}</Alert> : null}
             </Grid>
-          ) : null}
-          <Grid item xs={12}>
-            <TextField label="Original word" name="word" defaultValue={word.word} fullWidth />
+            {word.topic ? (
+              <Grid item xs={12} sx={{ mb: 2 }}>
+                <Typography variant="h6">
+                  {word.topic.name}
+                  {word.topic.languageSource ? ` ${getLanguageLabel(word.topic.languageSource)}` : null} &rarr;{' '}
+                  {word.topic.languageTarget ? ` ${getLanguageLabel(word.topic.languageTarget)}` : null}
+                </Typography>
+              </Grid>
+            ) : null}
+            <Grid item xs={12}>
+              <TextField label="Original word" name="word" defaultValue={word.word} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="Translation" name="translation" defaultValue={word.translation} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" type="submit" name="intent" value="update">
+                Update
+              </Button>
+              <Button variant="contained" type="submit" name="intent" value="delete" color="error" sx={{ ml: 2 }}>
+                Delete
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <TextField label="Translation" name="translation" defaultValue={word.translation} fullWidth />
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" type="submit" name="intent" value="update">
-              Update
-            </Button>
-            <Button variant="contained" type="submit" name="intent" value="delete" color="error" sx={{ ml: 2 }}>
-              Delete
-            </Button>
-          </Grid>
-        </Grid>
-      </Form>
-      <Link to="/admin/words">
-        <Button variant="contained" sx={{ mt: 10 }} color="secondary">
-          Back to words
-        </Button>
-      </Link>
-    </Box>
+        </Form>
+        <Link to="/admin/words">
+          <CloseDialogButton />
+        </Link>
+      </DialogContent>
+    </>
   );
 }

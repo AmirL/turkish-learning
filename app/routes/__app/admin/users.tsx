@@ -1,10 +1,7 @@
 // @file  list of all users with pagination, and search by username
-
-import { Box, Pagination, Table, TextField } from '@mui/material';
+import { Box, Dialog, Pagination, Table, TextField } from '@mui/material';
 import type { LoaderArgs } from '@remix-run/node';
-import { Form, Link, useLoaderData, useSearchParams } from '@remix-run/react';
-import { invariant } from '@remix-run/router';
-import { requireUser } from '~/utils/auth.server';
+import { Form, Link, useLoaderData, useOutlet, useSearchParams } from '@remix-run/react';
 import { db } from '~/utils/db.server';
 
 import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
@@ -64,9 +61,10 @@ export default function AdminUsers() {
     timeStyle: 'short',
   });
 
+  const outlet = useOutlet();
+
   return (
     <>
-      <h2>Admin Users</h2>
       <Box sx={{ mb: 3 }}>
         <Form method="get">
           <TextField label="Search" name="search" fullWidth defaultValue={searchParams.get('search')} />
@@ -108,6 +106,7 @@ export default function AdminUsers() {
           ))}
         </TableBody>
       </Table>
+      <Dialog open={Boolean(outlet)}>{outlet}</Dialog>
     </>
   );
 }

@@ -66,7 +66,6 @@ export default function ImportFromCsv() {
 
   return (
     <>
-      <h1>Import from CSV</h1>
       <Box sx={{ justifyContent: 'center' }}>
         {data?.errors ? (
           <Box sx={{ mb: 5 }}>

@@ -1,10 +1,11 @@
 // @file edit user form by admin
 
-import { Alert, Box, Button, Grid, TextField } from '@mui/material';
+import { Alert, Box, Button, DialogContent, DialogTitle, Grid, TextField } from '@mui/material';
 import { json } from '@remix-run/node';
 import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
 import { invariant } from '@remix-run/router';
+import CloseDialogButton from '~/components/CloseDialogButton';
 import UserAvatar from '~/components/UserAvatar';
 import { hashPassword } from '~/models/user.server';
 
@@ -83,41 +84,41 @@ export default function EditUser() {
   const data = useActionData<typeof action>();
 
   return (
-    <Box sx={{ textAlign: 'center' }} maxWidth="xs">
-      <h1>Edit User {userData.name}</h1>
-      <Form method="post">
-        <Grid container spacing={2}>
-          <Grid item xs={12} justifyContent="center" display="flex">
-            <UserAvatar user={userData} sx={{ width: 100, height: 100 }} />
+    <>
+      <DialogTitle>Edit User {userData.name}</DialogTitle>
+      <DialogContent sx={{ textAlign: 'center' }}>
+        <Form method="post">
+          <Grid container spacing={2}>
+            <Grid item xs={12} justifyContent="center" display="flex">
+              <UserAvatar user={userData} sx={{ width: 100, height: 100 }} />
+            </Grid>
+            <Grid item xs={12}>
+              {data?.success ? <Alert severity="success">User updated successfully</Alert> : null}
+              {data?.error ? <Alert severity="error">{data.error}</Alert> : null}
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="name" name="name" defaultValue={userData.name} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="email" name="email" defaultValue={userData.email} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="password" name="password" type="password" fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="password confirmation" name="passwordConfirm" type="password" fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" type="submit">
+                Update
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            {data?.success ? <Alert severity="success">User updated successfully</Alert> : null}
-            {data?.error ? <Alert severity="error">{data.error}</Alert> : null}
-          </Grid>
-          <Grid item xs={12}>
-            <TextField label="name" name="name" defaultValue={userData.name} fullWidth />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField label="email" name="email" defaultValue={userData.email} fullWidth />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField label="password" name="password" type="password" fullWidth />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField label="password confirmation" name="passwordConfirm" type="password" fullWidth />
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" type="submit">
-              Update
-            </Button>
-          </Grid>
-        </Grid>
-      </Form>
-      <Link to="/admin/users">
-        <Button variant="contained" sx={{ mt: 10 }} color="secondary">
-          Back to users
-        </Button>
-      </Link>
-    </Box>
+        </Form>
+        <Link to="/admin/users">
+          <CloseDialogButton />
+        </Link>
+      </DialogContent>
+    </>
   );
 }

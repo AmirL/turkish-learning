@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 import { LoaderArgs, redirect } from '@remix-run/node';
 import { Link, Outlet, useLocation } from '@remix-run/react';
 import { requireUser } from '~/utils/auth.server';
@@ -41,7 +41,9 @@ export default function AdminActions() {
           <Tab label={link.label} component={Link} to={link.link} key={link.link} />
         ))}
       </Tabs>
-      <Outlet />
+      <Box sx={{ pt: 2 }}>
+        <Outlet />
+      </Box>
     </>
   );
 }
