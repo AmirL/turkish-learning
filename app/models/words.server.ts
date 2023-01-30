@@ -33,14 +33,14 @@ export async function getWordForStudying(topicId: number, user_id: number) {
       level: 0,
       wrong: 0,
     })),
-    ...words.map((word) => ({
-      ...word,
-      word: word.translation,
-      translation: word.word,
-      isReversed: true,
-      level: 0,
-      wrong: 0,
-    })),
+    // ...words.map((word) => ({
+    //   ...word,
+    //   word: word.translation,
+    //   translation: word.word,
+    //   isReversed: true,
+    //   level: 0,
+    //   wrong: 0,
+    // })),
   ];
 
   // load word progress for current user
