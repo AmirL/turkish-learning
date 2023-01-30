@@ -1,15 +1,12 @@
-import type { LoaderFunction, MetaFunction } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch, useLoaderData } from '@remix-run/react';
+import type { MetaFunction } from '@remix-run/node';
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch } from '@remix-run/react';
 
 import { withEmotionCache } from '@emotion/react';
 import { unstable_useEnhancedEffect as useEnhancedEffect } from '@mui/material';
 // import theme from '~/mui/theme';
 import ClientStyleContext from '~/mui/ClientStyleContext';
 import { useContext } from 'react';
-import Layout from '~/components/Layout';
 import mainStyle from '~/css/layout.css';
-import { getLoggedUser } from './utils/auth.server';
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -69,18 +66,18 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
   );
 });
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getLoggedUser(request);
-  return json({ user });
-};
+// export const loader: LoaderFunction = async ({ request }) => {
+//   const user = await getLoggedUser(request);
+//   return json({ user });
+// };
 
 export default function App() {
-  const data = useLoaderData<typeof loader>();
+  // const data = useLoaderData<typeof loader>();
   return (
     <Document>
-      <Layout user={data?.user}>
-        <Outlet />
-      </Layout>
+      <Outlet />
+      {/* <Layout user={data?.user}>
+      </Layout> */}
     </Document>
   );
 }
@@ -91,12 +88,10 @@ export function ErrorBoundary({ error }: { error: Error }) {
 
   return (
     <Document title="Error!">
-      <Layout>
-        <div>
-          <h1>There was an error</h1>
-          <p>{error.message}</p>
-        </div>
-      </Layout>
+      <div>
+        <h1>There was an error</h1>
+        <p>{error.message}</p>
+      </div>
     </Document>
   );
 }
@@ -120,12 +115,10 @@ export function CatchBoundary() {
 
   return (
     <Document title={`${caught.status} ${caught.statusText}`}>
-      <Layout>
-        <h1>
-          {caught.status}: {caught.statusText}
-        </h1>
-        {message}
-      </Layout>
+      <h1>
+        {caught.status}: {caught.statusText}
+      </h1>
+      {message}
     </Document>
   );
 }

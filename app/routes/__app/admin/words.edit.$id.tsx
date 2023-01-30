@@ -10,10 +10,6 @@ import { badRequest } from '~/utils/request.server';
 import { getLanguageLabel } from '~/utils/strings';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const user = await requireUser(request);
-
-  invariant(user.isAdmin, 'You must be an admin to access this page');
-
   const word = await db.word.findUnique({
     where: { id: Number(params.id) },
     include: {

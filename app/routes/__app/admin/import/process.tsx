@@ -86,7 +86,7 @@ export default function ImportFromCsv() {
         <Typography variant="body1">Words created: {data?.created}</Typography>
         <Typography variant="body1">Words skipped: {data?.skipped}</Typography>
       </Box>
-      <Link to="/import">
+      <Link to="/admin/import">
         <Button variant="contained">Go back</Button>
       </Link>
     </Box>

@@ -1,23 +1,17 @@
-// @file  list of all users with pagination, and search by username
+// @file  list of all words with pagination, and search by word
 
 import { Box, Pagination, Table, TextField } from '@mui/material';
 import type { LoaderArgs } from '@remix-run/node';
 import { Form, Link, useLoaderData, useSearchParams } from '@remix-run/react';
-import { invariant } from '@remix-run/router';
-import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
 
 import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import UserAvatar from '~/components/UserAvatar';
 import EditIcon from '@mui/icons-material/Edit';
+import { getLanguageLabel } from '~/utils/strings';
 
 const perPage = 10;
 
 export async function loader({ request }: LoaderArgs) {
-  const user = await requireUser(request);
-
-  invariant(user.isAdmin, 'You must be an admin to access this page');
-
   const url = new URL(request.url);
   const page = Number(url.searchParams.get('page')) || 0;
 
@@ -28,12 +22,12 @@ export async function loader({ request }: LoaderArgs) {
       ? {
           OR: [
             {
-              name: {
+              word: {
                 contains: search,
               },
             },
             {
-              email: {
+              translation: {
                 contains: search,
               },
             },
@@ -41,21 +35,22 @@ export async function loader({ request }: LoaderArgs) {
         }
       : undefined;
 
-  const pages = Math.floor((await db.user.count({ where })) / perPage) + 1;
+  const pages = Math.floor((await db.word.count({ where })) / perPage) + 1;
 
-  const users = await db.user.findMany({
+  const words = await db.word.findMany({
     where,
+    include: { topic: true },
     skip: page * perPage,
     take: perPage,
     orderBy: { createdAt: 'desc' },
   });
 
-  return { users, pages, page, status: 200 };
+  return { words, pages, page, status: 200 };
 }
 
 export default function AdminUsers() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { users, pages, page } = useLoaderData<typeof loader>();
+  const { words, pages, page } = useLoaderData<typeof loader>();
 
   const onPageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     const page = (value - 1).toString();
@@ -70,7 +65,7 @@ export default function AdminUsers() {
 
   return (
     <>
-      <h1>Admin Users</h1>
+      <h2>Words</h2>
       <Box sx={{ mb: 3 }}>
         <Form method="get">
           <TextField label="Search" name="search" fullWidth defaultValue={searchParams.get('search')} />
@@ -81,33 +76,33 @@ export default function AdminUsers() {
         <TableHead>
           <TableRow>
             <TableCell> </TableCell>
-
-            <TableCell>Username</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Role</TableCell>
+            <TableCell>Word</TableCell>
+            <TableCell>Translation</TableCell>
+            <TableCell>Topic</TableCell>
             <TableCell>Created At</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
+          {words.map((word) => (
+            <TableRow key={word.id}>
               <TableCell>
-                <Link to={`/admin/users/edit/${user.id}`}>
+                <Link to={`/admin/words/edit/${word.id}`}>
                   <EditIcon color="primary" />
                 </Link>
               </TableCell>
+              <TableCell>{word.word}</TableCell>
+              <TableCell>{word.translation}</TableCell>
               <TableCell>
-                <UserAvatar user={user} />
-                {user.name}
+                {word.topic ? (
+                  <Box>
+                    {word.topic.name}
+                    <br /> {getLanguageLabel(word.topic.languageSource)}
+                    {' → '}
+                    {getLanguageLabel(word.topic.languageTarget)}
+                  </Box>
+                ) : null}
               </TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>
-                {user.isAdmin ? 'Admin' : ''}
-                <br />
-                {user.isEditor ? 'Editor' : 'User'}
-                <br />
-              </TableCell>
-              <TableCell>{dateFormatter.format(new Date(user.createdAt))}</TableCell>
+              <TableCell>{dateFormatter.format(new Date(word.createdAt))}</TableCell>
             </TableRow>
           ))}
         </TableBody>

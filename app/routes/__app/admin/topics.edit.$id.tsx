@@ -10,10 +10,6 @@ import { badRequest } from '~/utils/request.server';
 import { getLanguageLabel } from '~/utils/strings';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const user = await requireUser(request);
-
-  invariant(user.isAdmin, 'You must be an admin to access this page');
-
   const topic = await db.topic.findUnique({
     where: { id: Number(params.id) },
   });
@@ -81,7 +77,7 @@ export default function EditUser() {
 
   return (
     <Box sx={{ textAlign: 'center' }} maxWidth="xs">
-      <h1>Edit Topic {topic.name}</h1>
+      <h2>Edit Topic {topic.name}</h2>
       <Form method="post">
         <Grid container spacing={2}>
           <Grid item xs={12}>

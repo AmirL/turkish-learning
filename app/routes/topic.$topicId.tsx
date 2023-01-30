@@ -1,6 +1,6 @@
 import { Box, Button, LinearProgress } from '@mui/material';
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
-import { Form, Link, useFetcher, useLoaderData, useRevalidator } from '@remix-run/react';
+import { Link, useLoaderData } from '@remix-run/react';
 import { db } from '~/utils/db.server';
 import { invariant } from '@remix-run/router';
 import { getLanguageLabel } from '~/utils/strings';
@@ -67,6 +67,7 @@ export default function StudyingTopic() {
         // remove word from words array
         wordsArray.splice(0, 1);
       } else {
+        // TODO recheck this, something goes wrong here
         const step = Math.floor(currentWord.level ** 1.6);
         // move word forward depending on level
         arrayMoveMutable(wordsArray, 0, step);

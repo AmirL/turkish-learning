@@ -8,6 +8,10 @@ import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
 import { getLoggedUser, login } from '~/utils/auth.server';
 
+export const handle = {
+  title: 'Sign up',
+};
+
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getLoggedUser(request);
   if (user) return redirect('/');
@@ -69,11 +73,10 @@ export default function Signup() {
   const submitText = transition.state !== 'idle' ? 'Signing up...' : 'Sign Up';
 
   return (
-    <Box sx={{ textAlign: 'center', width: '100%' }} maxWidth="xs">
-      <h1>Sign Up</h1>
+    <>
       <Form method="post">
         {/* Grid to style signup form */}
-        <Grid container spacing={2} xs={12}>
+        <Grid container spacing={2}>
           <Grid item xs={12}>
             {data?.formError ? (
               <Typography color="error" sx={{ textAlign: 'left' }}>
@@ -137,7 +140,7 @@ export default function Signup() {
               helperText={data?.fieldErrors?.confirmPassword}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} justifyContent="center" display="flex">
             <Button type="submit" variant="contained" disabled={transition.state !== 'idle'}>
               {submitText}
             </Button>
@@ -148,7 +151,7 @@ export default function Signup() {
       <p>
         <Link to="/login">Already have an account?</Link>
       </p>
-    </Box>
+    </>
   );
 }
 

@@ -9,6 +9,10 @@ import type { TopicInfo } from '~/models/topics.server';
 import { getTopics } from '~/models/topics.server';
 import { getLanguageLabel } from '~/utils/strings';
 
+export const handle = {
+  title: 'Topics',
+};
+
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
@@ -29,7 +33,6 @@ export default function Index() {
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
-      <h1>Topics</h1>
       {data.languages.map((language) => {
         return (
           <div key={language}>

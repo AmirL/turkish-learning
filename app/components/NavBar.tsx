@@ -1,13 +1,13 @@
 import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
 import { Link, useLocation } from '@remix-run/react';
 import HomeIcon from '@mui/icons-material/Home';
-import ImportExportIcon from '@mui/icons-material/ImportExport';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import type { User } from '~/models/user.server';
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import type { SerializeFrom } from '@remix-run/node';
 
-export default function NavBar({ user }: { user: User }) {
+export default function NavBar({ user }: { user: SerializeFrom<User> }) {
   const location = useLocation();
 
   const navBar = [
@@ -16,9 +16,9 @@ export default function NavBar({ user }: { user: User }) {
   ];
 
   // remove import tab for non editors
-  if (user && user.isAdmin) {
-    // add admin tab for admins
-    navBar.push({ label: 'Admin', icon: <AdminPanelSettingsIcon />, link: '/admin' });
+  if (user.isAdmin) {
+    // add admin tab for admins only
+    navBar.push({ label: 'Admin', icon: <AdminPanelSettingsIcon />, link: '/admin/import' });
   }
 
   return (

@@ -7,6 +7,10 @@ import { Box } from '@mui/system';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
 
+export const handle = {
+  title: 'Login',
+};
+
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getLoggedUser(request);
   if (user) return redirect('/');
@@ -59,8 +63,7 @@ export default function Login() {
   const submitText = transtion.state === 'idle' ? 'Login' : 'Logging in...';
 
   return (
-    <Box sx={{ textAlign: 'center' }} maxWidth="xs">
-      <h1>Login</h1>
+    <>
       <Form method="post">
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12}>
@@ -94,8 +97,8 @@ export default function Login() {
               autoComplete="current-password"
             />
           </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary" fullWidth disabled={transtion.state !== 'idle'}>
+          <Grid item xs={12} justifyContent="center" display="flex">
+            <Button type="submit" variant="contained" color="primary" disabled={transtion.state !== 'idle'}>
               {submitText}
             </Button>
           </Grid>
@@ -107,6 +110,6 @@ export default function Login() {
           Sign up
         </Link>
       </Typography>
-    </Box>
+    </>
   );
 }

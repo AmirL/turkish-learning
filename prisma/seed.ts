@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 import { faker } from '@faker-js/faker';
+import { hashPassword } from '~/models/user.server';
 
 const prisma = new PrismaClient();
 
@@ -17,11 +18,11 @@ async function main() {
   const adminAvatar = await generateRandomAvatarImage();
   const count = await prisma.user.count();
   if (count === 0) {
-    const admin = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email: 'Admin',
         name: 'Admin',
-        password: 'Admin',
+        password: await hashPassword('admin'),
         avatar: adminAvatar,
         isAdmin: true,
         isEditor: true,
@@ -36,7 +37,7 @@ async function main() {
       data: {
         email: faker.internet.email(),
         name: faker.name.firstName(),
-        password: faker.internet.password(),
+        password: await hashPassword(faker.internet.password()),
         avatar,
         isAdmin: false,
         isEditor: false,

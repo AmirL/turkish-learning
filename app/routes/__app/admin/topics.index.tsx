@@ -14,10 +14,6 @@ import { getLanguageLabel } from '~/utils/strings';
 const perPage = 10;
 
 export async function loader({ request }: LoaderArgs) {
-  const user = await requireUser(request);
-
-  invariant(user.isAdmin, 'You must be an admin to access this page');
-
   const url = new URL(request.url);
   const page = Number(url.searchParams.get('page')) || 0;
 
@@ -61,7 +57,7 @@ export default function AdminUsers() {
 
   return (
     <>
-      <h1>Topics</h1>
+      <h2>Topics</h2>
       <Box sx={{ mb: 3 }}>
         <Form method="get">
           <TextField label="Search" name="search" fullWidth defaultValue={searchParams.get('search')} />

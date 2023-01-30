@@ -13,10 +13,6 @@ import { db } from '~/utils/db.server';
 import { badRequest } from '~/utils/request.server';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const user = await requireUser(request);
-
-  invariant(user.isAdmin, 'You must be an admin to access this page');
-
   const userData = await db.user.findUnique({
     where: { id: Number(params.id) },
   });

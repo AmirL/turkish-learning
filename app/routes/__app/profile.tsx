@@ -7,6 +7,10 @@ import UserAvatar from '~/components/UserAvatar';
 import { changeUserAvatar } from '~/models/user.server';
 import { requireUser } from '~/utils/auth.server';
 
+export const handle = {
+  title: 'User Profile',
+};
+
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireUser(request);
 
@@ -30,8 +34,7 @@ export default function UserProfile() {
   const loading = transition.state === 'loading' || transition.state === 'submitting';
 
   return (
-    <div>
-      <h1>User Profile</h1>
+    <>
       <Container sx={{ mt: 5 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
           <UserAvatar user={data.user} sx={{ width: avatarSize, height: avatarSize, mb: 2 }} />
@@ -52,6 +55,6 @@ export default function UserProfile() {
           </Button>
         </Form>
       </Container>
-    </div>
+    </>
   );
 }
