@@ -49,7 +49,7 @@ const H1Styled = styled.h1`
 `;
 
 export default function StudyingTopic() {
-  const { topic, words, totalWords, user } = useLoaderData<typeof loader>();
+  const { topic, words, totalWords } = useLoaderData<typeof loader>();
 
   const [currentWord, setCurrentWord] = useState<Word>(words[0]);
   const [wordsArray, setWordsArray] = useState<Word[]>(words);
@@ -68,13 +68,13 @@ export default function StudyingTopic() {
         wordsArray.splice(0, 1);
       } else {
         // TODO recheck this, something goes wrong here
-        const step = Math.floor(currentWord.level ** 1.6);
+        const step = Math.floor(currentWord.level ** 1.8);
         // move word forward depending on level
         arrayMoveMutable(wordsArray, 0, step);
       }
       if (wordsArray.length < 3) {
         axios
-          .post(`/topic/progress/topic/${topic.id}`, {
+          .post(`/progress/topic/${topic.id}`, {
             completed: true,
           })
           .then(() => {
@@ -88,7 +88,7 @@ export default function StudyingTopic() {
       arrayMoveMutable(wordsArray, 0, 1);
     }
 
-    axios.post(`/topic/progress/word/${currentWord.id}`, {
+    axios.post(`/progress/word/${currentWord.id}`, {
       correct,
       level: currentWord.level,
       isReversed: currentWord.isReversed,

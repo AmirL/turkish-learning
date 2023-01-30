@@ -7,7 +7,7 @@ export function InitSpeech() {
   }
 
   const voices = window.speechSynthesis.getVoices();
-  console.log('voices', voices);
+  // console.log('voices', voices);
 
   const langs = ['en', 'ru', 'tr'];
   // create a new utterance for each language
@@ -22,7 +22,7 @@ const getLanguage = (names: string[], lang: string) => {
   const voices = window.speechSynthesis.getVoices();
   const voicesFiltered = voices.filter((voice) => voice.lang.startsWith(lang));
 
-  console.log('Voices for', lang, voicesFiltered);
+  // console.log('Voices for', lang, voicesFiltered);
 
   if (names.length > 0) {
     for (const name of names) {
@@ -46,9 +46,6 @@ export function SpeakText(text: string, language: string) {
     return;
   }
 
-  const voices = window.speechSynthesis.getVoices();
-  console.log('voices', voices);
-
   const msg = msgSource.get(language);
   if (msg && (!lastMsg || lastMsg.text !== text)) {
     speechSynthesis.cancel();
@@ -65,7 +62,6 @@ export function SpeakText(text: string, language: string) {
         break;
       case 'en':
         msg.voice = getLanguage(['Karen', 'Daniel', 'US.Samantha'], language);
-        console.log(msg.voice);
         msg.volume = 0.8;
         break;
     }

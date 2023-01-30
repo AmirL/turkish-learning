@@ -48,3 +48,11 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   return json({}, 200);
 };
+
+export default function TopicProgress() {
+  return (
+    <div>
+      <h1>Topic Progress</h1>
+    </div>
+  );
+}

@@ -1,6 +1,6 @@
 import { Button } from '@mui/material';
 
-export default function CloseDialog() {
+export default function CloseDialogButton() {
   return (
     <Button variant="text" sx={{ mt: 10 }} color="primary">
       Close
