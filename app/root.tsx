@@ -1,11 +1,21 @@
 import type { MetaFunction } from '@remix-run/node';
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch } from '@remix-run/react';
+import {
+  Links,
+  LiveReload,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useCatch,
+  useLocation,
+  useMatches,
+} from '@remix-run/react';
 
 import { withEmotionCache } from '@emotion/react';
 import { unstable_useEnhancedEffect as useEnhancedEffect } from '@mui/material';
 // import theme from '~/mui/theme';
 import ClientStyleContext from '~/mui/ClientStyleContext';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import mainStyle from '~/css/layout.css';
 
 export const meta: MetaFunction = () => ({
@@ -26,6 +36,7 @@ interface DocumentProps {
   title?: string;
 }
 
+let isMount = true;
 const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCache) => {
   const clientStyleData = useContext(ClientStyleContext);
 
@@ -45,6 +56,40 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  let location = useLocation();
+  let matches = useMatches();
+
+  useEffect(() => {
+    let mounted = isMount;
+    isMount = false;
+    if ('serviceWorker' in navigator) {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller?.postMessage({
+          type: 'REMIX_NAVIGATION',
+          isMount: mounted,
+          location,
+          matches,
+          manifest: window.__remixManifest,
+        });
+      } else {
+        let listener = async () => {
+          await navigator.serviceWorker.ready;
+          navigator.serviceWorker.controller?.postMessage({
+            type: 'REMIX_NAVIGATION',
+            isMount: mounted,
+            location,
+            matches,
+            manifest: window.__remixManifest,
+          });
+        };
+        navigator.serviceWorker.addEventListener('controllerchange', listener);
+        return () => {
+          navigator.serviceWorker.removeEventListener('controllerchange', listener);
+        };
+      }
+    }
+  }, [location]);
+
   return (
     <html lang="en">
       <head>
@@ -53,6 +98,12 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
         {/* <meta name="theme-color" content={theme.palette.primary.main} /> */}
         {title ? <title>{title}</title> : null}
         <Meta />
+
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
         <Links />
         <meta name="emotion-insertion-point" content="emotion-insertion-point" />
       </head>

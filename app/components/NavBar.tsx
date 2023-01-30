@@ -22,7 +22,7 @@ export default function NavBar({ user }: { user: SerializeFrom<User> }) {
   }
 
   return (
-    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: 80 }} elevation={3}>
       <BottomNavigation value={location.pathname}>
         {navBar.map((item) => (
           <BottomNavigationAction

@@ -36,7 +36,7 @@ export default function AppLayout() {
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img src="/logo.png" alt="logo" width="50" height="50" />
               <Box sx={{ ml: 2 }}>
-                <h2>Wordbook</h2>
+                <h2>MemoLang</h2>
               </Box>
             </Box>
             {loading ? <CircularProgress /> : null}
@@ -46,7 +46,7 @@ export default function AppLayout() {
             </Stack>
           </Box>
         </Paper>
-        <Box sx={{ my: 4, mt: 13 }}>
+        <Box sx={{ my: 4, mt: 13, mb: 15 }}>
           {title ? <h1>{title}</h1> : null}
           <Outlet />
         </Box>
