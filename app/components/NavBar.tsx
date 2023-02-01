@@ -6,12 +6,14 @@ import type { User } from '~/models/user.server';
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import type { SerializeFrom } from '@remix-run/node';
+import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 
 export default function NavBar({ user }: { user: SerializeFrom<User> }) {
   const location = useLocation();
 
   const navBar = [
     { label: 'Home', icon: <HomeIcon />, link: '/' },
+    { label: 'Charts', icon: <LeaderboardIcon />, link: '/charts' },
     { label: 'Profile', icon: <AccountBoxIcon />, link: '/profile' },
   ];
 

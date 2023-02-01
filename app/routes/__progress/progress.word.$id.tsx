@@ -12,6 +12,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const word = await db.word.findUnique({
     where: { id: Number(params.id) },
+    include: { topic: true },
   });
 
   invariant(word, 'Word not found');
@@ -20,6 +21,8 @@ export const action: ActionFunction = async ({ request, params }) => {
   invariant(typeof correct === 'boolean', 'Correct is required');
   invariant(typeof isReversed === 'boolean', 'isReversed is required');
   invariant(typeof level === 'number', 'Level is required');
+
+  const language = word.topic?.languageSource ?? 'en';
 
   await updateWordProgress({ correct, level, user_id: user.id, word_id: word.id, isReversed });
 
@@ -36,7 +39,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   });
 
   const todaySession = await db.studySession.findUnique({
-    where: { user_id_date: { user_id: user.id, date: sessionDate } },
+    where: { user_id_date_language: { user_id: user.id, date: sessionDate, language } },
   });
 
   // calculate ratio and round to decimal percent
@@ -45,7 +48,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   // update user session progress
   await db.studySession.upsert({
-    where: { user_id_date: { user_id: user.id, date: sessionDate } },
+    where: { user_id_date_language: { user_id: user.id, date: sessionDate, language } },
     update: {
       known: knownWords,
       correct: {
@@ -56,6 +59,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       },
       shown: { increment: 1 },
       ratio: roundedRatio,
+      language,
     },
     create: {
       user_id: user.id,
@@ -65,6 +69,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       wrong: correct ? 0 : 1,
       shown: 1,
       ratio: correct ? 100 : 0,
+      language,
     },
   });
 
