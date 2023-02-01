@@ -18,11 +18,15 @@ import {
   TimeScale,
 } from 'chart.js';
 
-import { Bar, Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
-import { StudySession } from '@prisma/client';
+import type { StudySession } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
+
+export const handle = {
+  title: 'Study Progress',
+};
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
@@ -70,7 +74,6 @@ export default function ProgressCharts() {
 
   return (
     <div>
-      <h1>Progress</h1>
       {init
         ? sessions.map((session) => {
             return (
