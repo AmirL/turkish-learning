@@ -96,17 +96,18 @@ model TopicProgress {
 model StudySession {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   user_id   Int     @db.UnsignedInt
-  date      DateTime @default(now())
-  words     Int     @db.UnsignedInt @default(0)
+  date      DateTime @db.Date()
   correct  Int    @db.UnsignedInt @default(0)
   wrong     Int     @db.UnsignedInt @default(0)
   known     Int     @db.UnsignedInt @default(0)
   shown     Int     @db.UnsignedInt @default(0)
+  ratio    Int    @db.UnsignedInt @default(0)
   user      User?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "StudySession_user_id_fkey")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([user_id], map: "user_id")
+  @@unique([user_id, date], map: "user_id_date")
 }
 
 model Images {
