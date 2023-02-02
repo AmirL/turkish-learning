@@ -24,8 +24,11 @@ export default function NavBar({ user }: { user: SerializeFrom<User> }) {
   }
 
   return (
-    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: 80 }} elevation={3}>
-      <BottomNavigation value={location.pathname}>
+    <Paper
+      sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: 80, backgroundColor: '#E8EDF1' }}
+      elevation={3}
+    >
+      <BottomNavigation value={location.pathname} sx={{ backgroundColor: '#E8EDF1' }}>
         {navBar.map((item) => (
           <BottomNavigationAction
             component={Link}

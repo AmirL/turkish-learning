@@ -14,6 +14,11 @@ import axios from 'axios';
 
 type Word = SerializeFrom<WordWithProgress>;
 
+export const handle = {
+  title: 'Study',
+  simpleBackground: true,
+};
+
 export async function loader({ request, params }: LoaderArgs) {
   const user = await requireUser(request);
 
@@ -115,10 +120,10 @@ export default function StudyingTopic() {
 
   return (
     <Box>
-      <h1>{topic.name}</h1>
-      <h2>
+      <h2>{topic.name}</h2>
+      <h3>
         {getLanguageLabel(topic.languageSource)} - {getLanguageLabel(topic.languageTarget)}
-      </h2>
+      </h3>
       {completed ? (
         // big congrats in justifying center
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

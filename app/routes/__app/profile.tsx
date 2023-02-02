@@ -8,7 +8,7 @@ import { changeUserAvatar } from '~/models/user.server';
 import { requireUser } from '~/utils/auth.server';
 
 export const handle = {
-  title: 'User Profile',
+  title: 'Profile',
 };
 
 export const loader: LoaderFunction = async ({ request }) => {

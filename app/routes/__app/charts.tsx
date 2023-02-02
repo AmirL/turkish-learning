@@ -25,7 +25,8 @@ import type { StudySession } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
 
 export const handle = {
-  title: 'Study Progress',
+  title: 'Progress',
+  simpleBackground: true,
 };
 
 export async function loader({ request }: LoaderArgs) {
@@ -101,50 +102,68 @@ function prepareChartData(sessions: SerializeFrom<StudySession>[]) {
 function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }) {
   const { knownWords, wrong, correct, shown, ratio, labels } = prepareChartData(sessions);
 
-  const chartData = {
+  const color1 = '#A5C0B3';
+  const borderColor1 = '#607678';
+  const color2 = '#F2E0BE90';
+  const borderColor2 = '#fcd07e';
+
+  const chartData1 = {
     labels,
     datasets: [
       {
-        label: 'Known Words',
-        data: knownWords,
-        backgroundColor: ['rgba(54, 162, 235, 0.2)'],
-        borderColor: ['rgba(54, 162, 235, 1)'],
-        borderWidth: 1,
-      },
-      {
-        label: 'Wrong Words',
-        data: wrong,
-        backgroundColor: ['rgba(255, 99, 132, 0.2)'],
-        borderColor: ['rgba(255, 99, 132, 1)'],
-        borderWidth: 1,
-      },
-      {
         label: 'Correct Words',
         data: correct,
-        backgroundColor: ['rgba(75, 192, 192, 0.2)'],
-        borderColor: ['rgba(75, 192, 192, 1)'],
+        fill: true,
+        backgroundColor: [color1],
+        borderColor: [borderColor1],
         borderWidth: 1,
       },
       {
         label: 'Shown Words',
         data: shown,
-        backgroundColor: ['rgba(255, 206, 86, 0.2)'],
-        borderColor: ['rgba(255, 206, 86, 1)'],
+        fill: true,
+        backgroundColor: [color2],
+        borderColor: [borderColor2],
         borderWidth: 1,
-      },
-      {
-        label: 'Ratio',
-        data: ratio,
-        backgroundColor: ['rgba(153, 102, 255, 0.2)'],
-        borderColor: ['rgba(153, 102, 255, 1)'],
-        borderWidth: 1,
-        yAxisID: 'yRatio',
       },
     ],
   };
+
+  const chartData2 = {
+    labels,
+    datasets: [
+      {
+        label: 'Ratio',
+        data: ratio,
+        fill: true,
+        backgroundColor: [color1],
+        borderColor: [borderColor1],
+        borderWidth: 1,
+        yAxisID: 'yRatio',
+      },
+      {
+        label: 'Known Words',
+        data: knownWords,
+        fill: true,
+        backgroundColor: [color2],
+        borderColor: [borderColor2],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <LinearChart data={chartData1} />
+      <LinearChart data={chartData2} />
+    </>
+  );
+}
+
+function LinearChart({ data }: { data: any }) {
   return (
     <Line
-      data={chartData}
+      data={data}
       options={{
         scales: {
           y: {
@@ -168,15 +187,11 @@ function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }
           tooltip: {
             callbacks: {
               label: (item) => {
-                // console.log(item);
                 // format item.parsed.x as dd.mm.YYYY
                 return new Date(item.parsed.x).toLocaleDateString('ru-RU');
               },
               title: (item) => {
-                // console.log(item);
                 return `${item[0].dataset.label}: ${item[0].parsed.y.toString()}`;
-                // return item[0].dataset.label;
-                // return new Date(item.parsed.x).toLocaleDateString();
               },
             },
           },

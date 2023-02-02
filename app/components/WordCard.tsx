@@ -13,17 +13,33 @@ type WordCardProps = {
 };
 
 const CorrectButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.success.main,
+  color: theme.palette.primary.main,
   fontSize: '1.5em',
   // disable uppercase
   textTransform: 'none',
 }));
 
 const RepeatButton = styled(Button)(({ theme }) => ({
-  color: '#d32f2f',
+  color: theme.palette.error.main,
   fontSize: '1.5em',
   // disable uppercase
   textTransform: 'none',
+}));
+
+const PaperStyled = styled(Paper)(({ theme }) => ({
+  borderRadius: '16px',
+  padding: 25,
+  margin: 25,
+  minHeight: 200,
+  backgroundColor: '#7B7664',
+  color: '#FFF',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  '&.flipped': {
+    backgroundColor: '#527166',
+    // color: '#062E05',
+  },
 }));
 
 export function WordCard({ word, userAnswerHandler, languageSource, languageTarget }: WordCardProps) {
@@ -42,13 +58,16 @@ export function WordCard({ word, userAnswerHandler, languageSource, languageTarg
 
   return (
     <Box>
-      <Paper elevation={3} sx={{ p: 5, m: 5, bgcolor: flipped ? '#6B4E90' : '#427A82' }} onClick={flip}>
-        <Grid container justifyContent="center">
-          <Typography variant="h4" alignContent="center" textAlign="center" color="white">
-            {text}
-          </Typography>
-        </Grid>
-      </Paper>
+      <PaperStyled
+        elevation={3}
+        className={flipped ? 'flipped' : ''}
+        // sx={{ borderRadius: '16px', p: 5, m: 5, bgcolor: flipped ? '#6B4E90' : '#FFF' }}
+        onClick={flip}
+      >
+        <Typography variant="h4" alignContent="center" textAlign="center">
+          {text}
+        </Typography>
+      </PaperStyled>
       {flipped ? (
         <Stack spacing={5} direction="row" justifyContent="center">
           <CorrectButton

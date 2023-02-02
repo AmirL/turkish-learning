@@ -13,7 +13,7 @@ import {
 
 import { withEmotionCache } from '@emotion/react';
 import { unstable_useEnhancedEffect as useEnhancedEffect } from '@mui/material';
-// import theme from '~/mui/theme';
+import theme from '~/mui/theme';
 import ClientStyleContext from '~/mui/ClientStyleContext';
 import { useContext, useEffect } from 'react';
 import mainStyle from '~/css/layout.css';
@@ -90,12 +90,22 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
     }
   }, [location]);
 
+  let bodyStyle = {
+    background: 'linear-gradient(-180deg, #FBF5E3 40%, #E8EDF1 70%) no-repeat #E8EDF1',
+    // backgroundColor: '#E8EDF1',
+  };
+  // find simpleBackground in matches
+  if (matches.some((match) => match.handle?.simpleBackground)) {
+    // unset background
+    bodyStyle.background = '#E8EDF1';
+  }
+
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        {/* <meta name="theme-color" content={theme.palette.primary.main} /> */}
+        <meta name="theme-color" content={theme.palette.primary.main} />
         {title ? <title>{title}</title> : null}
         <Meta />
 
@@ -107,7 +117,7 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
         <Links />
         <meta name="emotion-insertion-point" content="emotion-insertion-point" />
       </head>
-      <body>
+      <body style={bodyStyle}>
         {children}
         <ScrollRestoration />
         <Scripts />

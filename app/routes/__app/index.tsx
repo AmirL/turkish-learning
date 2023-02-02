@@ -1,13 +1,14 @@
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import { Link, useLoaderData, useTransition } from '@remix-run/react';
 import { requireUser } from '~/utils/auth.server';
-import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Box, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { styled } from '@mui/system';
 import type { TopicInfo } from '~/models/topics.server';
 import { getTopics } from '~/models/topics.server';
 import { getLanguageLabel } from '~/utils/strings';
+import WordsCountIcon from '@mui/icons-material/FeaturedPlayList';
 
 export const handle = {
   title: 'Topics',
@@ -50,38 +51,32 @@ export default function Index() {
 }
 
 const ListStyled = styled(ListItem)({
-  backgroundColor: '#42a5f5',
+  backgroundColor: '#fff',
   borderWidth: '1px',
   borderStyle: 'solid',
-  borderColor: '#42a5f5',
-  borderRadius: '4px',
-  // darker on hover and touch
-  '&:hover': {
-    backgroundColor: '#1e88e5',
-    borderColor: '#1e88e5',
-  },
-  '&:active': {
-    backgroundColor: '#1976d2',
-    borderColor: '#1976d2',
+  borderColor: '#E9E8E4',
+  borderRadius: '16px',
+  padding: '16px',
+  marginBottom: '16px',
+  // shadow
+  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+  '&.completed': {
+    backgroundColor: '#E3F0EE',
+    borderColor: '#DAE5E8',
+    color: '#43764E',
   },
   // change color if has disabled class
   '&.disabled': {
-    backgroundColor: '#1976d2',
-    borderColor: '#1976d2',
-    '&:hover': {
-      backgroundColor: '#1976d2',
-      borderColor: '#1976d2',
-    },
-    '&:active': {
-      backgroundColor: '#1976d2',
-      borderColor: '#1976d2',
-    },
+    backgroundColor: '#E8EDF1',
+    borderColor: '#E8EDF1',
   },
 });
 
 const StyledLink = styled(Link)({
   textDecoration: 'none',
-  color: 'white',
+  color: '#202B57',
+  // bold
+  fontWeight: 'bold',
   // disabe pointer icon when has disabled class
   '&.disabled': {
     pointerEvents: 'none',
@@ -94,15 +89,21 @@ function ListTopics({ topics, disabled }: { topics: SerializeFrom<TopicInfo>[]; 
       {topics.map((topic) => {
         return (
           <StyledLink key={topic.id} to={`/topic/${topic.id}`} className={disabled ? 'disabled' : ''}>
-            <ListStyled sx={{ mb: 1 }} className={disabled ? 'disabled' : ''}>
+            <ListStyled
+              sx={{ mb: 1.5 }}
+              // set class name disabled or completed depends on topic status
+              className={disabled ? 'disabled' : topic.completed ? 'completed' : ''}
+            >
               <ListItemText>
-                <Typography sx={{ fontWeight: 'bold' }}>{topic.name} </Typography>({topic.wordsCount} words)
+                <Typography sx={{ fontWeight: 'bold' }}>{topic.name} </Typography>
               </ListItemText>
               <ListItemIcon>
                 {topic.completed ? (
-                  <CheckBoxIcon sx={{ color: 'white' }} />
+                  <CheckBoxIcon sx={{ color: '#489471' }} />
                 ) : (
-                  <CheckBoxOutlineBlankIcon sx={{ color: 'white' }} />
+                  <>
+                    <WordsCountIcon sx={{ mr: 1 }} /> {topic.wordsCount}
+                  </>
                 )}
               </ListItemIcon>
             </ListStyled>

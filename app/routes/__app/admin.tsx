@@ -5,6 +5,7 @@ import { requireUser } from '~/utils/auth.server';
 
 export const handle = {
   title: 'Admin Panel',
+  simpleBackground: true,
 };
 
 export async function loader({ request }: LoaderArgs) {
@@ -15,10 +16,6 @@ export async function loader({ request }: LoaderArgs) {
   }
 
   return { status: 200 };
-}
-
-export async function action({ request }: LoaderArgs) {
-  console.log('ACTION *****');
 }
 
 export default function AdminActions() {
