@@ -102,11 +102,6 @@ function prepareChartData(sessions: SerializeFrom<StudySession>[]) {
 function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }) {
   const { knownWords, wrong, correct, shown, ratio, labels } = prepareChartData(sessions);
 
-  const color1 = '#A5C0B3';
-  const borderColor1 = '#607678';
-  const color2 = '#F2E0BE90';
-  const borderColor2 = '#fcd07e';
-
   const chartData1 = {
     labels,
     datasets: [
@@ -114,16 +109,16 @@ function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }
         label: 'Correct Words',
         data: correct,
         fill: true,
-        backgroundColor: [color1],
-        borderColor: [borderColor1],
+        backgroundColor: ['#A5C0B3'],
+        borderColor: ['#607678'],
         borderWidth: 1,
       },
       {
         label: 'Shown Words',
         data: shown,
         fill: true,
-        backgroundColor: [color2],
-        borderColor: [borderColor2],
+        backgroundColor: ['#F2E0BE90'],
+        borderColor: ['#fcd07e'],
         borderWidth: 1,
       },
     ],
@@ -136,8 +131,9 @@ function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }
         label: 'Ratio %',
         data: ratio,
         fill: true,
-        backgroundColor: ['#954D9E30'],
-        borderColor: ['#954D9E'],
+        // orange color
+        backgroundColor: ['#fcd07e90'],
+        borderColor: ['#f39c12'],
         borderWidth: 1,
         yAxisID: 'yRatio',
       },
@@ -145,8 +141,9 @@ function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }
         label: 'Known Words',
         data: knownWords,
         fill: true,
-        backgroundColor: ['#BFD1F2'],
-        borderColor: ['#4E7F9E'],
+        // very dark green color
+        backgroundColor: ['#60767890'],
+        borderColor: ['#34495E'],
         borderWidth: 1,
       },
     ],
