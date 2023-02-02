@@ -133,11 +133,11 @@ function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }
     labels,
     datasets: [
       {
-        label: 'Ratio',
+        label: 'Ratio %',
         data: ratio,
         fill: true,
-        backgroundColor: [color1],
-        borderColor: [borderColor1],
+        backgroundColor: ['#954D9E30'],
+        borderColor: ['#954D9E'],
         borderWidth: 1,
         yAxisID: 'yRatio',
       },
@@ -145,8 +145,8 @@ function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }
         label: 'Known Words',
         data: knownWords,
         fill: true,
-        backgroundColor: [color2],
-        borderColor: [borderColor2],
+        backgroundColor: ['#BFD1F2'],
+        borderColor: ['#4E7F9E'],
         borderWidth: 1,
       },
     ],
@@ -155,12 +155,12 @@ function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }
   return (
     <>
       <LinearChart data={chartData1} />
-      <LinearChart data={chartData2} />
+      <LinearChart data={chartData2} yAxis />
     </>
   );
 }
 
-function LinearChart({ data }: { data: any }) {
+function LinearChart({ data, yAxis = false }: { data: any; yAxis?: boolean }) {
   return (
     <Line
       data={data}
@@ -168,6 +168,11 @@ function LinearChart({ data }: { data: any }) {
         scales: {
           y: {
             beginAtZero: true,
+            position: yAxis ? 'right' : 'left',
+          },
+          yRatio: {
+            beginAtZero: true,
+            display: yAxis,
           },
           x: {
             type: 'linear',
@@ -176,12 +181,6 @@ function LinearChart({ data }: { data: any }) {
                 return new Date(value).toLocaleDateString('ru-RU');
               },
             },
-          },
-          yRatio: {
-            type: 'linear',
-            // right
-            position: 'right',
-            beginAtZero: true,
           },
         },
         plugins: {
