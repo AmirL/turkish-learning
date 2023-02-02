@@ -30,13 +30,14 @@ export const action: ActionFunction = async ({ request, params }) => {
   const sessionDate = new Date();
   sessionDate.setUTCHours(0, 0, 0, 0);
 
-  // get known words count
-  const knownWords = await db.wordProgress.count({
-    where: {
-      user_id: user.id,
-      level: { gte: 5 },
-    },
-  });
+  type KnowWordsRes = { knownWords: string };
+  const knownWordsRes: KnowWordsRes[] = await db.$queryRaw`
+  SELECT COUNT(DISTINCT w.id) AS knownWords FROM WordProgress wp
+  INNER JOIN Word w ON wp.word_id = w.id
+  INNER JOIN Topic t ON w.topic_id = t.id
+  WHERE wp.user_id = ${user.id} AND wp.level >= 5 AND t.languageSource = ${language}
+`;
+  const knownWords = parseInt(knownWordsRes[0].knownWords, 10);
 
   const todaySession = await db.studySession.findUnique({
     where: { user_id_date_language: { user_id: user.id, date: sessionDate, language } },

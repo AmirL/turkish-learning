@@ -181,6 +181,7 @@ function LinearChart({ data }: { data: any }) {
             type: 'linear',
             // right
             position: 'right',
+            beginAtZero: true,
           },
         },
         plugins: {
