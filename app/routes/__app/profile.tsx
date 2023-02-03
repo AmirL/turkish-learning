@@ -6,6 +6,7 @@ import { Form, useLoaderData, useTransition } from '@remix-run/react';
 import UserAvatar from '~/components/UserAvatar';
 import { changeUserAvatar } from '~/models/user.server';
 import { requireUser } from '~/utils/auth.server';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
   title: 'Profile',

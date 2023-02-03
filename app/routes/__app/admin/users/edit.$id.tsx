@@ -12,6 +12,7 @@ import { hashPassword } from '~/models/user.server';
 import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
 import { badRequest } from '~/utils/request.server';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const userData = await db.user.findUnique({

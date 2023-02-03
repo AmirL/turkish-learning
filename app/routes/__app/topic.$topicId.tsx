@@ -11,6 +11,7 @@ import { WordCard } from '~/components/WordCard';
 import { requireUser } from '~/utils/auth.server';
 import styled from '@emotion/styled';
 import axios from 'axios';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 type Word = SerializeFrom<WordWithProgress>;
 
@@ -115,8 +116,8 @@ export default function StudyingTopic() {
   const progress = totalLevel / (totalWords * 5);
   const completed = wordsArray.length < 3;
 
-  const wordLanguageSource = !currentWord.isReversed ? topic.languageSource : topic.languageTarget;
-  const wordLanguageTarget = !currentWord.isReversed ? topic.languageTarget : topic.languageSource;
+  const wordLanguageSource = !currentWord?.isReversed ? topic.languageSource : topic.languageTarget;
+  const wordLanguageTarget = !currentWord?.isReversed ? topic.languageTarget : topic.languageSource;
 
   return (
     <Box>

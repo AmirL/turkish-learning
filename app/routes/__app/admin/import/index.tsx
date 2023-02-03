@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { invariant } from '@remix-run/router';
 import Papa from 'papaparse';
 import style from '~/css/importCsv.css';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export function links() {
   return [{ rel: 'stylesheet', href: style }];

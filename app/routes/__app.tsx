@@ -1,13 +1,14 @@
 import { Outlet, useLoaderData, useMatches } from '@remix-run/react';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import { CircularProgress, Paper, Stack } from '@mui/material';
+import { CircularProgress, Stack } from '@mui/material';
 import { useTransition } from '@remix-run/react';
 import type { LoaderArgs } from '@remix-run/node';
 import { requireUser } from '~/utils/auth.server';
 import UserAvatar from '~/components/UserAvatar';
 import NavBar from '~/components/NavBar';
 import { styled } from '@mui/system';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);

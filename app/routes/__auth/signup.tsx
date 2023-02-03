@@ -1,12 +1,11 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
-
 import { Form, Link, useSearchParams, useActionData, useTransition } from '@remix-run/react';
-
 import { createUser, getUserByEmail } from '~/models/user.server';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
 import { getLoggedUser, login } from '~/utils/auth.server';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
   title: 'Sign up',

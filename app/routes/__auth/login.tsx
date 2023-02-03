@@ -3,9 +3,9 @@ import { redirect } from '@remix-run/node';
 import authenticator, { getLoggedUser, login } from '~/utils/auth.server';
 import { json } from '@remix-run/node';
 import { Form, Link, useActionData, useTransition } from '@remix-run/react';
-import { Box } from '@mui/system';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
   title: 'Login',

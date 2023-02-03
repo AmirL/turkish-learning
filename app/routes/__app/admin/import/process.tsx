@@ -10,6 +10,7 @@ import { db } from '~/utils/db.server';
 import { Link, useActionData } from '@remix-run/react';
 import { Box } from '@mui/system';
 import { Button, Typography } from '@mui/material';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 function IsRowType(row: any): row is Row {
   return row.word && row.translation && row.languageSource && row.languageTarget && row.topic;

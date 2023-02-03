@@ -3,13 +3,12 @@
 import { Box, Dialog, Pagination, Table, TextField } from '@mui/material';
 import type { LoaderArgs } from '@remix-run/node';
 import { Form, Link, useLoaderData, useOutlet, useSearchParams } from '@remix-run/react';
-import { invariant } from '@remix-run/router';
-import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
 
 import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { getLanguageLabel } from '~/utils/strings';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 const perPage = 10;
 

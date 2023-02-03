@@ -1,7 +1,9 @@
 import { Box, Tab, Tabs } from '@mui/material';
-import { LoaderArgs, redirect } from '@remix-run/node';
+import type { LoaderArgs } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import { Link, Outlet, useLocation } from '@remix-run/react';
 import { requireUser } from '~/utils/auth.server';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
   title: 'Admin Panel',

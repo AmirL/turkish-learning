@@ -1,6 +1,7 @@
 // @file  list of all words with pagination, and search by word
 
-import { Dialog, SelectChangeEvent } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
+import { Dialog } from '@mui/material';
 import { Box, MenuItem, Pagination, Select, Table, TextField } from '@mui/material';
 import type { LoaderArgs } from '@remix-run/node';
 import { Form, Link, useLoaderData, useOutlet, useSearchParams } from '@remix-run/react';
@@ -10,6 +11,7 @@ import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { getLanguageLabel } from '~/utils/strings';
 import { useRef } from 'react';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 const perPage = 10;
 

@@ -99,7 +99,6 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
     // unset background
     bodyStyle.background = '#E8EDF1';
   }
-
   return (
     <html lang="en">
       <head>
@@ -127,18 +126,10 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
   );
 });
 
-// export const loader: LoaderFunction = async ({ request }) => {
-//   const user = await getLoggedUser(request);
-//   return json({ user });
-// };
-
 export default function App() {
-  // const data = useLoaderData<typeof loader>();
   return (
     <Document>
       <Outlet />
-      {/* <Layout user={data?.user}>
-      </Layout> */}
     </Document>
   );
 }

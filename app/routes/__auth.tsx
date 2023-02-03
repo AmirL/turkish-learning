@@ -1,5 +1,6 @@
 import { Box, Stack } from '@mui/material';
 import { Outlet, useMatches } from '@remix-run/react';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export default function AuthLayout() {
   const matches = useMatches();

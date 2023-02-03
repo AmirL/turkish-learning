@@ -1,14 +1,14 @@
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import { Link, useLoaderData, useTransition } from '@remix-run/react';
 import { requireUser } from '~/utils/auth.server';
-import { Box, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { styled } from '@mui/system';
 import type { TopicInfo } from '~/models/topics.server';
 import { getTopics } from '~/models/topics.server';
 import { getLanguageLabel } from '~/utils/strings';
 import WordsCountIcon from '@mui/icons-material/FeaturedPlayList';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
   title: 'Topics',

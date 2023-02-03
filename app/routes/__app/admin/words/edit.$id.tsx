@@ -9,6 +9,7 @@ import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
 import { badRequest } from '~/utils/request.server';
 import { getLanguageLabel } from '~/utils/strings';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const word = await db.word.findUnique({
