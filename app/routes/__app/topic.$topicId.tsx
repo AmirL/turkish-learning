@@ -88,8 +88,11 @@ export default function StudyingTopic() {
           });
       }
     } else {
-      // decrease word level
-      if (currentWord.level > 0) currentWord.level--;
+      // decrease word level by 2
+      currentWord.level -= 2;
+      if (currentWord.level < 0) {
+        currentWord.level = 0;
+      }
       // move forward to show after 1 step
       arrayMoveMutable(wordsArray, 0, 1);
     }
