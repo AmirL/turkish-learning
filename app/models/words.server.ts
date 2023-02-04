@@ -90,72 +90,34 @@ type UpdateWordProgressParams = {
 
 export async function updateWordProgress({ correct, level, user_id, word_id, isReversed }: UpdateWordProgressParams) {
   const day = 24 * 60 * 60 * 1000;
+  const nextReviewSteps = [null, null, null, null, null, 2, 4, 8, 16, 32, 90];
+  const nextReviewStep = nextReviewSteps[level] || 90;
 
-  if (correct) {
-    // if level >= 5 set next review date to 2 days from today
-    // if level < 5 set next review date null
-    let nextReviewStep;
-    switch (level) {
-      case 5:
-        nextReviewStep = 2;
-      case 6:
-        nextReviewStep = 4;
-        break;
-      case 7:
-        nextReviewStep = 8;
-        break;
-      case 8:
-        nextReviewStep = 16;
-        break;
-      case 9:
-        nextReviewStep = 32;
-        break;
-      default:
-        nextReviewStep = 90;
-        break;
-    }
-
-    const nextReviewDate = level >= 5 ? new Date(Date.now() + nextReviewStep * day) : null;
-    await db.wordProgress.upsert({
-      where: { user_id_word_id_isReversed: { user_id, word_id, isReversed } },
-      update: {
-        level,
-        correct: { increment: 1 },
-        views: { increment: 1 },
-        nextReview: nextReviewDate,
-      },
-      create: {
-        level,
-        correct: 1,
-        views: 1,
-        wrong: 0,
-        user: { connect: { id: user_id } },
-        word: { connect: { id: word_id } },
-        isReversed,
-        nextReview: nextReviewDate,
-      },
-    });
-  } else {
-    // set next review date to tomorrow
-    const nextReviewDate = new Date(Date.now() + day);
-    await db.wordProgress.upsert({
-      where: { user_id_word_id_isReversed: { user_id, word_id, isReversed } },
-      update: {
-        level,
-        nextReview: nextReviewDate,
-        wrong: { increment: 1 },
-        views: { increment: 1 },
-      },
-      create: {
-        level,
-        correct: 0,
-        views: 1,
-        wrong: 1,
-        nextReview: null,
-        user: { connect: { id: user_id } },
-        word: { connect: { id: word_id } },
-        isReversed,
-      },
-    });
+  let nextReviewDate;
+  if (correct && level >= 5) {
+    nextReviewDate = new Date(Date.now() + nextReviewStep * day);
+  } else if (!correct) {
+    nextReviewDate = new Date(Date.now() + day);
   }
+
+  await db.wordProgress.upsert({
+    where: { user_id_word_id_isReversed: { user_id, word_id, isReversed } },
+    update: {
+      level,
+      correct: correct ? { increment: 1 } : undefined,
+      wrong: !correct ? { increment: 1 } : undefined,
+      views: { increment: 1 },
+      nextReview: nextReviewDate,
+    },
+    create: {
+      level,
+      correct: correct ? 1 : 0,
+      views: 1,
+      wrong: !correct ? 1 : 0,
+      user: { connect: { id: user_id } },
+      word: { connect: { id: word_id } },
+      isReversed,
+      nextReview: nextReviewDate,
+    },
+  });
 }
