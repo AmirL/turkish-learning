@@ -62,6 +62,9 @@ export async function loader({ request, params }: LoaderArgs) {
 
   const totalWords = wordsWithProgress.length;
 
+  // randomize words
+  wordsWithProgress.sort(() => Math.random() - 0.5);
+
   return {
     language: getLanguageLabel(lang),
     totalWords,
