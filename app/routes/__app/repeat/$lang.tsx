@@ -51,7 +51,10 @@ export async function loader({ request, params }: LoaderArgs) {
 
   // prepare WordWithProgress objects
   const wordsWithProgress = words.map((wordProgress) => ({
-    ...wordProgress.word,
+    id: wordProgress.word.id,
+    word: !wordProgress.isReversed ? wordProgress.word.word : wordProgress.word.translation,
+    translation: !wordProgress.isReversed ? wordProgress.word.translation : wordProgress.word.word,
+    topic: wordProgress.word.topic,
     isReversed: wordProgress.isReversed,
     level: wordProgress.level,
     wrong: wordProgress.wrong,
