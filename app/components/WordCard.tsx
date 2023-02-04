@@ -43,8 +43,8 @@ const PaperStyled = styled(Paper)(({ theme }) => ({
 export function WordCard({ word, userAnswerHandler }: WordCardProps) {
   const [flipped, setFlipped] = useState(false);
 
-  const languageSource = word.topic.languageSource;
-  const languageTarget = word.topic.languageTarget;
+  const languageSource = !word.isReversed ? word.topic.languageSource : word.topic.languageTarget;
+  const languageTarget = !word.isReversed ? word.topic.languageTarget : word.topic.languageSource;
 
   const text = flipped ? word.translation : word.word;
   const language = flipped ? languageTarget : languageSource;
