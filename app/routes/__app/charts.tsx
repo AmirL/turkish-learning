@@ -23,6 +23,8 @@ import { useEffect, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { StudySession } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
+
 
 export const handle = {
   title: 'Progress',

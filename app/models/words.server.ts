@@ -1,3 +1,5 @@
+import type { Topic } from '@prisma/client';
+import type { SerializeFrom } from '@remix-run/node';
 import { db } from '~/utils/db.server';
 
 export type WordWithProgress = {
@@ -7,14 +9,13 @@ export type WordWithProgress = {
   isReversed: boolean;
   level: number;
   wrong: number; // number of wrong answers. Boost level to 4 if answer correct from 1st try
+  topic: SerializeFrom<Topic>;
 };
 
 export async function getWordForStudying(topicId: number, user_id: number) {
   const words = await db.word.findMany({
-    select: {
-      id: true,
-      word: true,
-      translation: true,
+    include: {
+      topic: true,
     },
     where: {
       topic_id: Number(topicId),
@@ -120,4 +121,24 @@ export async function updateWordProgress({ correct, level, user_id, word_id, isR
       nextReview: nextReviewDate,
     },
   });
+}
+
+type LanguageData = {
+  language: string;
+  count: string;
+};
+
+export async function languagesToRepeat(user_id: number) {
+  // get count of words for each language with nextReview less or equal to today
+  const languages: LanguageData[] = await db.$queryRaw`
+  SELECT t.languageSource as language, COUNT(*) as count FROM WordProgress wp
+  INNER JOIN Word w ON w.id = wp.word_id
+  INNER JOIN Topic t ON t.id = w.topic_id
+  WHERE
+  user_id = ${user_id}
+  AND nextReview <= CURRENT_DATE
+  GROUP BY t.languageSource
+  HAVING count > 5
+  `;
+  return languages;
 }

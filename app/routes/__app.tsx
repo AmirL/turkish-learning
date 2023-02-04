@@ -8,11 +8,19 @@ import { requireUser } from '~/utils/auth.server';
 import UserAvatar from '~/components/UserAvatar';
 import NavBar from '~/components/NavBar';
 import { styled } from '@mui/system';
+import { languagesToRepeat } from '~/models/words.server';
+import { createContext, useState } from 'react';
+import { AppContext } from '~/components/AppContext';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
-  return { user };
+
+  const repeatLanguages = await languagesToRepeat(user.id);
+  // summ languages count
+  const repeatCount = repeatLanguages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
+
+  return { user, repeatCount };
 }
 
 const TopBarStyled = styled(Box)({
@@ -28,7 +36,7 @@ const TopBarStyled = styled(Box)({
 });
 
 export default function AppLayout() {
-  const { user } = useLoaderData<typeof loader>();
+  const { user, repeatCount } = useLoaderData<typeof loader>();
 
   const matches = useMatches();
   // find match with title in handle property
@@ -40,8 +48,10 @@ export default function AppLayout() {
   const loading = transtion.state === 'loading' || transtion.state === 'submitting';
   const simpleBackground = matches.some((match) => match.handle?.simpleBackground);
 
+  const [repeatBadge, setRepeatBadge] = useState(repeatCount);
+
   return (
-    <>
+    <AppContext.Provider value={{ repeatCount: repeatBadge, setRepeatCount: setRepeatBadge }}>
       <Container maxWidth="sm">
         <TopBarStyled className={simpleBackground ? 'simpleBackground' : ''}>
           <Box
@@ -69,6 +79,6 @@ export default function AppLayout() {
         </Box>
         <NavBar user={user} />
       </Container>
-    </>
+    </AppContext.Provider>
   );
 }

@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import type { SerializeFrom } from '@remix-run/node';
 import { useEffect, useState } from 'react';
 import { styled } from '@mui/system';
@@ -7,8 +7,6 @@ import { SpeakText } from './SpeakText';
 
 type WordCardProps = {
   word: SerializeFrom<WordWithProgress>;
-  languageSource: string;
-  languageTarget: string;
   userAnswerHandler: (correct: boolean) => void;
 };
 
@@ -42,8 +40,11 @@ const PaperStyled = styled(Paper)(({ theme }) => ({
   },
 }));
 
-export function WordCard({ word, userAnswerHandler, languageSource, languageTarget }: WordCardProps) {
+export function WordCard({ word, userAnswerHandler }: WordCardProps) {
   const [flipped, setFlipped] = useState(false);
+
+  const languageSource = word.topic.languageSource;
+  const languageTarget = word.topic.languageTarget;
 
   const text = flipped ? word.translation : word.word;
   const language = flipped ? languageTarget : languageSource;

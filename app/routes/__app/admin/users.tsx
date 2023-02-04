@@ -7,6 +7,8 @@ import { db } from '~/utils/db.server';
 import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import UserAvatar from '~/components/UserAvatar';
 import EditIcon from '@mui/icons-material/Edit';
+export { ErrorBoundary } from '~/components/ErrorBoundary';
+
 
 const perPage = 10;
 
