@@ -88,8 +88,8 @@ export default function StudyingTopic() {
       if (currentWord.level > 4) {
         currentWord.level--;
       }
-      // move word to the end of array
-      arrayMoveMutable(wordsArray, 0, wordsArray.length - 1);
+      // move word to 3 to 6 position
+      arrayMoveMutable(wordsArray, 0, Math.floor(Math.random() * 3) + 3);
     }
 
     axios.post(`/progress/word/${currentWord.id}`, {

@@ -91,14 +91,21 @@ type UpdateWordProgressParams = {
 
 export async function updateWordProgress({ correct, level, user_id, word_id, isReversed }: UpdateWordProgressParams) {
   const day = 24 * 60 * 60 * 1000;
-  const nextReviewSteps = [null, null, null, null, null, 2, 4, 8, 16, 32, 90];
-  const nextReviewStep = nextReviewSteps[level] || 90;
+  const nextReviewSteps = [null, null, null, null, null, 1, 3, 6, 14, 30, 90, 180, 365];
+  const nextReviewStep = nextReviewSteps[level] || 365;
+  const today = new Date(Date.now());
+  today.setUTCHours(0, 0, 0, 0);
 
-  let nextReviewDate;
+  // get current nextReview date from db
+  const currentProgress = await db.wordProgress.findUnique({
+    where: { user_id_word_id_isReversed: { user_id, word_id, isReversed } },
+  });
+
+  // current nextReview date or null
+  let nextReviewDate = currentProgress?.nextReview || null;
   if (correct && level >= 5) {
-    nextReviewDate = new Date(Date.now() + nextReviewStep * day);
-  } else if (!correct) {
-    nextReviewDate = new Date(Date.now() + day);
+    // today plus nextReviewStep days
+    nextReviewDate = new Date(today.getTime() + nextReviewStep * day);
   }
 
   await db.wordProgress.upsert({
@@ -108,6 +115,7 @@ export async function updateWordProgress({ correct, level, user_id, word_id, isR
       correct: correct ? { increment: 1 } : undefined,
       wrong: !correct ? { increment: 1 } : undefined,
       views: { increment: 1 },
+      // keep nextReview date is not correct answer, and update if correct answer and level >= 5
       nextReview: nextReviewDate,
     },
     create: {
