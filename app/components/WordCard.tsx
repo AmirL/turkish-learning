@@ -4,10 +4,13 @@ import { useEffect, useState } from 'react';
 import { styled } from '@mui/system';
 import type { WordWithProgress } from '~/models/words.server';
 import { SpeakText } from './SpeakText';
+import type { User } from '@prisma/client';
+import axios from 'axios';
 
 type WordCardProps = {
   word: SerializeFrom<WordWithProgress>;
   userAnswerHandler: (correct: boolean) => void;
+  user: SerializeFrom<User>;
 };
 
 const CorrectButton = styled(Button)(({ theme }) => ({
@@ -40,7 +43,7 @@ const PaperStyled = styled(Paper)(({ theme }) => ({
   },
 }));
 
-export function WordCard({ word, userAnswerHandler }: WordCardProps) {
+export function WordCard({ word, userAnswerHandler, user }: WordCardProps) {
   const [flipped, setFlipped] = useState(false);
 
   const languageSource = !word.isReversed ? word.topic.languageSource : word.topic.languageTarget;
@@ -49,13 +52,23 @@ export function WordCard({ word, userAnswerHandler }: WordCardProps) {
   const text = flipped ? word.translation : word.word;
   const language = flipped ? languageTarget : languageSource;
 
+  const [isMuted, setIsMuted] = useState(user.muteSpeach);
+
+  const switchMute = () => {
+    setIsMuted((prev) => !prev);
+    // send by axios to /user/mute
+    axios.post('/user/mute', { muteSpeach: !isMuted });
+  };
+
   function flip() {
     setFlipped((prev) => !prev);
   }
 
   useEffect(() => {
-    SpeakText(text, language);
-  }, [text, language]);
+    if (!isMuted) {
+      SpeakText(text, language);
+    }
+  }, [text, language, isMuted]);
 
   return (
     <Box>
@@ -90,6 +103,11 @@ export function WordCard({ word, userAnswerHandler }: WordCardProps) {
         </Stack>
       ) : null}
       <p style={{ textAlign: 'center' }}>*Click on the word to flip</p>
+      <Box sx={{ textAlign: 'center' }}>
+        <Button onClick={switchMute} variant="outlined">
+          {isMuted ? 'Unmute' : 'Mute'} speach
+        </Button>
+      </Box>
     </Box>
   );
 }

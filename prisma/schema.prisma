@@ -19,6 +19,7 @@ model User {
   avatar    String @db.MediumText
   isEditor   Boolean  @default(false)
   isAdmin    Boolean  @default(false)
+  muteSpeach Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   words     WordProgress[]
@@ -36,6 +37,7 @@ model Word {
   topic       Topic   @relation(fields: [topic_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Word_topic_id_fkey")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 
   @@index([topic_id], map: "topic_id")
   // unique index for word,  topic and language pair

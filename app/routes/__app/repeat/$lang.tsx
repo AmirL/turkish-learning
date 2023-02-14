@@ -69,11 +69,12 @@ export async function loader({ request, params }: LoaderArgs) {
     language: getLanguageLabel(lang),
     totalWords,
     words: wordsWithProgress,
+    user,
   };
 }
 
 export default function StudyingTopic() {
-  const { words, totalWords, language } = useLoaderData<typeof loader>();
+  const { words, totalWords, language, user } = useLoaderData<typeof loader>();
 
   const [currentWord, setCurrentWord] = useState<Word>(words[0]);
   const [wordsArray, setWordsArray] = useState<Word[]>(words);
@@ -116,7 +117,7 @@ export default function StudyingTopic() {
       ) : (
         <>
           <LinearProgress variant="determinate" value={progress * 100} />
-          <WordCard word={currentWord} userAnswerHandler={userAnswerHandler} />
+          <WordCard word={currentWord} userAnswerHandler={userAnswerHandler} user={user} />
         </>
       )}
     </Box>
