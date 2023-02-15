@@ -6,6 +6,8 @@ import type { WordWithProgress } from '~/models/words.server';
 import { SpeakText } from './SpeakText';
 import type { User } from '@prisma/client';
 import axios from 'axios';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 type WordCardProps = {
   word: SerializeFrom<WordWithProgress>;
@@ -105,7 +107,7 @@ export function WordCard({ word, userAnswerHandler, user }: WordCardProps) {
       <p style={{ textAlign: 'center' }}>*Click on the word to flip</p>
       <Box sx={{ textAlign: 'center' }}>
         <Button onClick={switchMute} variant="outlined">
-          {isMuted ? 'Unmute' : 'Mute'} speach
+          {isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
         </Button>
       </Box>
     </Box>

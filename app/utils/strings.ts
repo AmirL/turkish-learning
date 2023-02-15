@@ -6,6 +6,7 @@ export function getLanguageLabel(language: string) {
     case 'tr':
       return '🇹🇷 Turkish';
     case 'ru':
+    default:
       return '🇷🇺 Russian';
   }
 }
