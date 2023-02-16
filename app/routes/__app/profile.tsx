@@ -46,6 +46,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
           learningMode: Number(learningMode),
         },
       });
+      // TODO recalc topic progress based on new learning mode
       break;
     default:
       break;
@@ -65,8 +66,8 @@ export default function UserProfile() {
   type option = { value: string; label: string };
   const languageOptions = languages.map<option>((lang) => ({ value: lang, label: getLanguageLabel(lang) }));
   const learningModes = [
-    { value: '0', label: `From ${getLanguageLabel(data.user.nativeLanguage)} to Target` },
-    { value: '1', label: `From Target to ${getLanguageLabel(data.user.nativeLanguage)}` },
+    { value: '0', label: `From Target to ${getLanguageLabel(data.user.nativeLanguage)}` },
+    { value: '1', label: `From ${getLanguageLabel(data.user.nativeLanguage)} to Target` },
     { value: '2', label: 'Both' },
   ];
 

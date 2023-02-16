@@ -17,7 +17,7 @@ export const handle = {
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
-  const repeatLanguages = await languagesToRepeat(user.id);
+  const repeatLanguages = await languagesToRepeat(user);
 
   return {
     languages: repeatLanguages,

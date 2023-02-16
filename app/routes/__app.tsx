@@ -16,7 +16,7 @@ export { ErrorBoundary } from '~/components/ErrorBoundary';
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
-  const repeatLanguages = await languagesToRepeat(user.id);
+  const repeatLanguages = await languagesToRepeat(user);
   // summ languages count
   const repeatCount = repeatLanguages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
 

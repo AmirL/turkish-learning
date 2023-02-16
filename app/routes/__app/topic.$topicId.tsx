@@ -34,7 +34,7 @@ export async function loader({ request, params }: LoaderArgs) {
 
   invariant(topic, 'Topic not found');
 
-  const words = await getWordForStudying(topic.id, user.id);
+  const words = await getWordForStudying(topic.id, user);
 
   invariant(words.length > 0, 'No words to study');
 

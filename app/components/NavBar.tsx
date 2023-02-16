@@ -11,13 +11,19 @@ import LoopIcon from '@mui/icons-material/Loop';
 import { useContext } from 'react';
 import { AppContext } from './AppContext';
 
+type NavBarItem = {
+  label: string;
+  icon: JSX.Element;
+  link: string;
+};
+
 export default function NavBar({ user }: { user: SerializeFrom<User> }) {
   const location = useLocation();
 
   const appContext = useContext(AppContext);
   const repeatCount = appContext.repeatCount ?? 0;
 
-  const navBar = [
+  const navBar: NavBarItem[] = [
     { label: 'Home', icon: <HomeIcon />, link: '/' },
     // show repeat count on the icon badge
     {

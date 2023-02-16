@@ -3,7 +3,7 @@ import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { db } from '~/utils/db.server';
 import { invariant } from '@remix-run/router';
-import type { WordWithProgress } from '~/models/words.server';
+import { LearningMode, WordWithProgress } from '~/models/words.server';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
 import { Box, LinearProgress } from '@mui/material';
@@ -27,6 +27,19 @@ export async function loader({ request, params }: LoaderArgs) {
 
   invariant(lang, 'Language is required');
 
+  let isReversed: boolean | undefined;
+  switch (user.learningMode) {
+    case LearningMode.normal:
+      isReversed = false;
+      break;
+    case LearningMode.reverse:
+      isReversed = true;
+      break;
+    case LearningMode.both:
+      isReversed = undefined;
+      break;
+  }
+
   // get all words with nextReview <= now and current language
   const words = await db.wordProgress.findMany({
     where: {
@@ -34,6 +47,7 @@ export async function loader({ request, params }: LoaderArgs) {
       nextReview: {
         lte: new Date(),
       },
+      isReversed,
       word: {
         topic: {
           languageSource: lang,
