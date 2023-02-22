@@ -101,13 +101,14 @@ model TopicProgress {
 model StudySession {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   user_id   Int     @db.UnsignedInt
-  date      DateTime @db.Date()
-  correct  Int    @db.UnsignedInt @default(0)
-  wrong     Int     @db.UnsignedInt @default(0)
-  known     Int     @db.UnsignedInt @default(0)
-  shown     Int     @db.UnsignedInt @default(0)
-  language String  @db.VarChar(2) @default("tr")
-  ratio    Int    @db.UnsignedInt @default(0)
+  date      DateTime @db.Date() // date of the study session
+  correct  Int    @db.UnsignedInt @default(0) // number of correct answers
+  wrong     Int     @db.UnsignedInt @default(0) // number of wrong answers
+  known     Int     @db.UnsignedInt @default(0) // level >= 5
+  wellKnown Int     @db.UnsignedInt @default(0) // level >= 8
+  shown     Int     @db.UnsignedInt @default(0) // number of words shown
+  language String  @db.VarChar(2) @default("tr") // language to learn
+  ratio    Int    @db.UnsignedInt @default(0) // correct / shown
   user      User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "StudySession_user_id_fkey")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

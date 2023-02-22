@@ -9,6 +9,7 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  BarElement,
   PointElement,
   LineElement,
   Title,
@@ -18,13 +19,12 @@ import {
   TimeScale,
 } from 'chart.js';
 
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { StudySession } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
-
 
 export const handle = {
   title: 'Progress',
@@ -62,7 +62,18 @@ export default function ProgressCharts() {
 
   useEffect(() => {
     if (init) return;
-    ChartJS.register(TimeScale, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend);
+    ChartJS.register(
+      TimeScale,
+      CategoryScale,
+      LinearScale,
+      BarElement,
+      PointElement,
+      LineElement,
+      Title,
+      Tooltip,
+      Filler,
+      Legend
+    );
     setInit(true);
   }, [init]);
 
@@ -82,7 +93,8 @@ export default function ProgressCharts() {
             return (
               <div key={session.language}>
                 <h2>{getLanguageLabel(session.language)}</h2>
-                <LanguageChart sessions={session.sessions} />
+                <RepeatRememberChart sessions={session.sessions} />
+                <KnownWordsChart sessions={session.sessions} />
               </div>
             );
           })
@@ -91,114 +103,78 @@ export default function ProgressCharts() {
   );
 }
 
-function prepareChartData(sessions: SerializeFrom<StudySession>[]) {
-  const labels = sessions.map((session) => new Date(session.date).getTime());
-  const knownWords = sessions.map((session) => session.known);
-  const wrong = sessions.map((session) => session.wrong);
-  const correct = sessions.map((session) => session.correct);
-  const shown = sessions.map((session) => session.shown);
-  const ratio = sessions.map((session) => session.ratio);
-  return { knownWords, wrong, correct, shown, ratio, labels };
-}
+function RepeatRememberChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }) {
+  const labels = sessions.map((session) => new Date(session.date).toLocaleDateString('ru-RU'));
 
-function LanguageChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }) {
-  const { knownWords, wrong, correct, shown, ratio, labels } = prepareChartData(sessions);
+  const options = {
+    responsive: true,
+    scales: {
+      y: {
+        stacked: true,
+      },
+      x: {
+        stacked: true,
+      },
+    },
+  };
 
-  const chartData1 = {
+  const data = {
     labels,
     datasets: [
       {
-        label: 'Correct Words',
-        data: correct,
-        fill: true,
-        backgroundColor: ['#A5C0B3'],
-        borderColor: ['#607678'],
+        label: 'Repeat',
+        data: sessions.map((session) => session.wrong),
+        backgroundColor: ['#fcd07e'],
+        borderColor: ['#E3A934'],
         borderWidth: 1,
       },
       {
-        label: 'Shown Words',
-        data: shown,
-        fill: true,
-        backgroundColor: ['#F2E0BE90'],
-        borderColor: ['#fcd07e'],
+        label: 'Remember',
+        data: sessions.map((session) => session.correct),
+        borderRadius: 15,
+        backgroundColor: ['#A5C0B3'],
+        borderColor: ['#49674C'],
         borderWidth: 1,
       },
     ],
   };
+  return <Bar data={data} options={options} />;
+}
 
-  const chartData2 = {
+function KnownWordsChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }) {
+  const labels = sessions.map((session) => new Date(session.date).toLocaleDateString('ru-RU'));
+
+  const options = {
+    responsive: true,
+    scales: {
+      y: {
+        stacked: true,
+      },
+      x: {
+        stacked: true,
+      },
+    },
+  };
+
+  const data = {
     labels,
     datasets: [
       {
-        label: 'Ratio %',
-        data: ratio,
-        fill: true,
-        // orange color
-        backgroundColor: ['#fcd07e90'],
-        borderColor: ['#f39c12'],
+        label: 'Repeat',
+        data: sessions.map((session) => session.wellKnown),
+        backgroundColor: ['#A5C0B3'],
+        borderColor: ['#49674C'],
         borderWidth: 1,
-        yAxisID: 'yRatio',
       },
       {
-        label: 'Known Words',
-        data: knownWords,
-        fill: true,
-        // very dark green color
+        label: 'Remember',
+        data: sessions.map((session) => session.known),
+        borderRadius: 15,
         backgroundColor: ['#60767890'],
         borderColor: ['#34495E'],
         borderWidth: 1,
       },
     ],
   };
-
-  return (
-    <>
-      <LinearChart data={chartData1} />
-      <LinearChart data={chartData2} yAxis />
-    </>
-  );
-}
-
-function LinearChart({ data, yAxis = false }: { data: any; yAxis?: boolean }) {
-  return (
-    <Line
-      data={data}
-      options={{
-        scales: {
-          y: {
-            beginAtZero: true,
-            position: yAxis ? 'right' : 'left',
-          },
-          yRatio: {
-            beginAtZero: true,
-            display: yAxis,
-          },
-          x: {
-            type: 'linear',
-            ticks: {
-              callback: (value) => {
-                return new Date(value).toLocaleDateString('ru-RU');
-              },
-            },
-          },
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: (item) => {
-                // format item.parsed.x as dd.mm.YYYY
-                return new Date(item.parsed.x).toLocaleDateString('ru-RU');
-              },
-              title: (item) => {
-                return `${item[0].dataset.label}: ${item[0].parsed.y.toString()}`;
-              },
-            },
-          },
-          legend: {
-            position: 'top' as const,
-          },
-        },
-      }}
-    />
-  );
+  return <Bar data={data} options={options} />;
 }

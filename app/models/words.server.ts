@@ -108,6 +108,11 @@ type UpdateWordProgressParams = {
 
 export async function updateWordProgress({ correct, level, user_id, word_id, isReversed }: UpdateWordProgressParams) {
   const day = 24 * 60 * 60 * 1000;
+  // 1 day for level 5
+  // 3 days for level 6
+  // 6 days for level 7
+  // 14 days for level 8
+  // 30 days for level 9
   const nextReviewSteps = [null, null, null, null, null, 1, 3, 6, 14, 30, 90, 180, 365];
   const nextReviewStep = nextReviewSteps[level] || 365;
   const today = new Date(Date.now());
