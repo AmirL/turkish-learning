@@ -139,6 +139,8 @@ export async function updateWordProgress({ correct, level, user_id, word_id, isR
       views: { increment: 1 },
       // keep nextReview date is not correct answer, and update if correct answer and level >= 5
       nextReview: nextReviewDate,
+      known: (currentProgress?.known ?? null) === null && level >= 5 ? today : undefined,
+      wellKnown: (currentProgress?.wellKnown ?? null) === null && level >= 8 ? today : undefined,
     },
     create: {
       level,

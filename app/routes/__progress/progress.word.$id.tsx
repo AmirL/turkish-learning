@@ -31,5 +31,3 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   return json({}, 200);
 };
-
-

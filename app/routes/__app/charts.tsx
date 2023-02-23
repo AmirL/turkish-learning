@@ -21,9 +21,11 @@ import {
 
 import { Line, Bar } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
-import { useLoaderData } from '@remix-run/react';
-import type { StudySession } from '@prisma/client';
+import { Link, useLoaderData } from '@remix-run/react';
+import type { StudySession, Topic, Word, WordProgress } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
+import { Box } from '@mui/system';
+import { Grid } from '@mui/material';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -39,8 +41,9 @@ export async function loader({ request }: LoaderArgs) {
     where: {
       user_id: user.id,
     },
+    take: 20,
     orderBy: {
-      date: 'asc',
+      date: 'desc',
     },
   });
 
@@ -54,7 +57,52 @@ export async function loader({ request }: LoaderArgs) {
 
   const languages = languagesData.map((language) => language.language);
 
-  return json({ sessions, languages }, 200);
+  // reverse sessions to show them in chronological order
+  sessions.reverse();
+
+  // get last known words for each language
+  const lastKnownWords = await db.wordProgress.findMany({
+    where: {
+      user_id: user.id,
+      // known is not null
+      known: {
+        not: null,
+      },
+    },
+    include: {
+      word: {
+        include: {
+          topic: true,
+        },
+      },
+    },
+    orderBy: {
+      known: 'desc',
+    },
+    take: 50,
+  });
+
+  const lastWellKnownWords = await db.wordProgress.findMany({
+    where: {
+      user_id: user.id,
+      wellKnown: {
+        not: null,
+      },
+    },
+    include: {
+      word: {
+        include: {
+          topic: true,
+        },
+      },
+    },
+    orderBy: {
+      wellKnown: 'desc',
+    },
+    take: 50,
+  });
+
+  return json({ sessions, languages, lastKnownWords, lastWellKnownWords }, 200);
 }
 
 export default function ProgressCharts() {
@@ -95,12 +143,49 @@ export default function ProgressCharts() {
                 <h2>{getLanguageLabel(session.language)}</h2>
                 <RepeatRememberChart sessions={session.sessions} />
                 <KnownWordsChart sessions={session.sessions} />
+                <Grid container spacing={2} gridTemplateColumns="repeat(2, 1fr)">
+                  <Grid item xs={6}>
+                    <Box sx={{ backgroundColor: '#C3DCBA', padding: '1rem', borderRadius: '0.5rem', mt: 3 }}>
+                      <h3>Learned words</h3>
+                      {getWordsByLanguage(data.lastKnownWords, session.language).map((word) => {
+                        return <div key={word.word.id}>{word.word.word}</div>;
+                      })}
+                      <Box sx={{ mt: 1 }}>
+                        <Link to={`/words?language=${session.language}`}>Show all</Link>
+                      </Box>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{ backgroundColor: '#A5C0B3', padding: '1rem', borderRadius: '0.5rem', mt: 3 }}>
+                      <h3>Well known words</h3>
+                      {getWordsByLanguage(data.lastWellKnownWords, session.language).map((word) => {
+                        return <div key={word.word.id}>{word.word.word}</div>;
+                      })}
+                      <Box sx={{ mt: 1 }}>
+                        <Link to={`/words?language=${session.language}`}>Show all</Link>
+                      </Box>
+                    </Box>
+                  </Grid>
+                </Grid>
               </div>
             );
           })
         : null}
     </div>
   );
+}
+
+type KnowWords = SerializeFrom<
+  WordProgress & {
+    word: Word & {
+      topic: Topic;
+    };
+  }
+>;
+
+function getWordsByLanguage(words: KnowWords[], language: string, limit = 10) {
+  const result = words.filter((word) => word.word.topic.languageSource === language);
+  return result.slice(0, limit);
 }
 
 function RepeatRememberChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }) {
@@ -160,18 +245,18 @@ function KnownWordsChart({ sessions }: { sessions: SerializeFrom<StudySession>[]
     labels,
     datasets: [
       {
-        label: 'Repeat',
+        label: 'Well known words',
         data: sessions.map((session) => session.wellKnown),
-        backgroundColor: ['#A5C0B3'],
-        borderColor: ['#49674C'],
+        backgroundColor: ['#60767890'],
+        borderColor: ['#34495E'],
         borderWidth: 1,
       },
       {
-        label: 'Remember',
+        label: 'Known words',
         data: sessions.map((session) => session.known),
         borderRadius: 15,
-        backgroundColor: ['#60767890'],
-        borderColor: ['#34495E'],
+        backgroundColor: ['#A5C0B3'],
+        borderColor: ['#49674C'],
         borderWidth: 1,
       },
     ],
