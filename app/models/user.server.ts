@@ -73,3 +73,81 @@ export async function verifyLogin(email: string, password: string) {
 
   return user;
 }
+
+export async function getUserLastWellKnownWords(user_id: number, count: number) {
+  return await db.wordProgress.findMany({
+    where: {
+      user_id: user_id,
+      wellKnown: {
+        not: null,
+      },
+    },
+    include: {
+      word: {
+        include: {
+          topic: true,
+        },
+      },
+    },
+    orderBy: {
+      wellKnown: 'desc',
+    },
+    take: count,
+  });
+}
+
+export async function getUserLastKnownWords(user_id: number, count: number) {
+  return await db.wordProgress.findMany({
+    where: {
+      user_id: user_id,
+      // known is not null
+      known: {
+        not: null,
+      },
+    },
+    include: {
+      word: {
+        include: {
+          topic: true,
+        },
+      },
+    },
+    orderBy: {
+      known: 'desc',
+    },
+    take: count,
+  });
+}
+
+export async function getUserStudyingLanguages(user_id: number) {
+  const languagesData = await db.studySession.groupBy({
+    by: ['language'],
+    _max: {
+      date: true,
+    },
+    orderBy: {
+      _max: {
+        date: 'desc',
+      },
+    },
+    where: {
+      user_id,
+    },
+  });
+
+  return languagesData.map((language) => language.language);
+}
+
+export async function getUserSessions(user_id: number, date: Date) {
+  return await db.studySession.findMany({
+    where: {
+      user_id,
+      date: {
+        gte: date,
+      },
+    },
+    orderBy: {
+      date: 'desc',
+    },
+  });
+}

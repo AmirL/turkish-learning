@@ -22,10 +22,18 @@ import {
 import { Line, Bar } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import { Link, useLoaderData } from '@remix-run/react';
-import type { StudySession, Topic, Word, WordProgress } from '@prisma/client';
+import type { StudySession, Topic, User, Word, WordProgress } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
 import { Box } from '@mui/system';
 import { Grid } from '@mui/material';
+import KnownWordsChart from '~/components/charts/KnownWordsChart';
+import RepeatRememberChart from '~/components/charts/RepeatRememberChart';
+import {
+  getUserLastKnownWords,
+  getUserLastWellKnownWords,
+  getUserSessions,
+  getUserStudyingLanguages,
+} from '~/models/user.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -36,71 +44,20 @@ export const handle = {
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
+  const FilterDate = new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000);
   // load sessions grouped by language and date
-  const sessions = await db.studySession.findMany({
-    where: {
-      user_id: user.id,
-    },
-    take: 20,
-    orderBy: {
-      date: 'desc',
-    },
-  });
-
-  // get languages from studySessions
-  const languagesData = await db.studySession.groupBy({
-    by: ['language'],
-    where: {
-      user_id: user.id,
-    },
-  });
-
-  const languages = languagesData.map((language) => language.language);
+  const sessions = await getUserSessions(user.id, FilterDate);
 
   // reverse sessions to show them in chronological order
   sessions.reverse();
 
-  // get last known words for each language
-  const lastKnownWords = await db.wordProgress.findMany({
-    where: {
-      user_id: user.id,
-      // known is not null
-      known: {
-        not: null,
-      },
-    },
-    include: {
-      word: {
-        include: {
-          topic: true,
-        },
-      },
-    },
-    orderBy: {
-      known: 'desc',
-    },
-    take: 50,
-  });
+  // get languages from studySessions
+  const languages = await getUserStudyingLanguages(user.id);
+  console.log('languages', languages);
 
-  const lastWellKnownWords = await db.wordProgress.findMany({
-    where: {
-      user_id: user.id,
-      wellKnown: {
-        not: null,
-      },
-    },
-    include: {
-      word: {
-        include: {
-          topic: true,
-        },
-      },
-    },
-    orderBy: {
-      wellKnown: 'desc',
-    },
-    take: 50,
-  });
+  // get last known words for each language
+  const lastKnownWords = await getUserLastKnownWords(user.id, 50);
+  const lastWellKnownWords = await getUserLastWellKnownWords(user.id, 50);
 
   return json({ sessions, languages, lastKnownWords, lastWellKnownWords }, 200);
 }
@@ -186,80 +143,4 @@ type KnowWords = SerializeFrom<
 function getWordsByLanguage(words: KnowWords[], language: string, limit = 10) {
   const result = words.filter((word) => word.word.topic.languageSource === language);
   return result.slice(0, limit);
-}
-
-function RepeatRememberChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }) {
-  const labels = sessions.map((session) => new Date(session.date).toLocaleDateString('ru-RU'));
-
-  const options = {
-    responsive: true,
-    scales: {
-      y: {
-        stacked: true,
-      },
-      x: {
-        stacked: true,
-      },
-    },
-  };
-
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Repeat',
-        data: sessions.map((session) => session.wrong),
-        backgroundColor: ['#fcd07e'],
-        borderColor: ['#E3A934'],
-        borderWidth: 1,
-      },
-      {
-        label: 'Remember',
-        data: sessions.map((session) => session.correct),
-        borderRadius: 15,
-        backgroundColor: ['#A5C0B3'],
-        borderColor: ['#49674C'],
-        borderWidth: 1,
-      },
-    ],
-  };
-  return <Bar data={data} options={options} />;
-}
-
-function KnownWordsChart({ sessions }: { sessions: SerializeFrom<StudySession>[] }) {
-  const labels = sessions.map((session) => new Date(session.date).toLocaleDateString('ru-RU'));
-
-  const options = {
-    responsive: true,
-    scales: {
-      y: {
-        stacked: true,
-      },
-      x: {
-        stacked: true,
-      },
-    },
-  };
-
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Well known words',
-        data: sessions.map((session) => session.wellKnown),
-        backgroundColor: ['#60767890'],
-        borderColor: ['#34495E'],
-        borderWidth: 1,
-      },
-      {
-        label: 'Known words',
-        data: sessions.map((session) => session.known),
-        borderRadius: 15,
-        backgroundColor: ['#A5C0B3'],
-        borderColor: ['#49674C'],
-        borderWidth: 1,
-      },
-    ],
-  };
-  return <Bar data={data} options={options} />;
 }
