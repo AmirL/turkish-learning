@@ -33,6 +33,8 @@ import {
   getUserLastWellKnownWords,
   getUserSessions,
   getUserStudyingLanguages,
+  getUserTotalWords,
+  TotalWordsCount,
 } from '~/models/user.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
@@ -53,13 +55,15 @@ export async function loader({ request }: LoaderArgs) {
 
   // get languages from studySessions
   const languages = await getUserStudyingLanguages(user.id);
-  console.log('languages', languages);
 
   // get last known words for each language
   const lastKnownWords = await getUserLastKnownWords(user.id, 50);
   const lastWellKnownWords = await getUserLastWellKnownWords(user.id, 50);
 
-  return json({ sessions, languages, lastKnownWords, lastWellKnownWords }, 200);
+  const totalKnownWords = await getUserTotalWords(user.id, 'known');
+  const totalWellKnownWords = await getUserTotalWords(user.id, 'wellKnown');
+
+  return json({ sessions, languages, lastKnownWords, lastWellKnownWords, totalKnownWords, totalWellKnownWords }, 200);
 }
 
 export default function ProgressCharts() {
@@ -103,7 +107,7 @@ export default function ProgressCharts() {
                 <Grid container spacing={2} gridTemplateColumns="repeat(2, 1fr)">
                   <Grid item xs={6}>
                     <Box sx={{ backgroundColor: '#C3DCBA', padding: '1rem', borderRadius: '0.5rem', mt: 3 }}>
-                      <h3>Learned words</h3>
+                      <h3>Learned words - {getTotalByLanguage(data.totalKnownWords, session.language)}</h3>
                       {getWordsByLanguage(data.lastKnownWords, session.language).map((word) => {
                         return <div key={word.word.id}>{word.word.word}</div>;
                       })}
@@ -114,7 +118,7 @@ export default function ProgressCharts() {
                   </Grid>
                   <Grid item xs={6}>
                     <Box sx={{ backgroundColor: '#A5C0B3', padding: '1rem', borderRadius: '0.5rem', mt: 3 }}>
-                      <h3>Well known words</h3>
+                      <h3>Well known words - {getTotalByLanguage(data.totalWellKnownWords, session.language)}</h3>
                       {getWordsByLanguage(data.lastWellKnownWords, session.language).map((word) => {
                         return <div key={word.word.id}>{word.word.word}</div>;
                       })}
@@ -131,6 +135,12 @@ export default function ProgressCharts() {
     </div>
   );
 }
+
+const getTotalByLanguage = (words: SerializeFrom<TotalWordsCount[]>, language: string) => {
+  // get first values with language
+  const first = words.find((word) => word.language === language);
+  return first?.count || 0;
+};
 
 type KnowWords = SerializeFrom<
   WordProgress & {
