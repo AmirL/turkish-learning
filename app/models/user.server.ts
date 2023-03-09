@@ -119,7 +119,6 @@ export async function getUserLastKnownWords(user_id: number, count: number) {
   });
 }
 
-
 export type WordStatus = 'known' | 'wellKnown';
 export type TotalWordsCount = {
   language: string;
@@ -144,9 +143,9 @@ export async function getUserTotalWords(user_id: number, status: WordStatus) {
       languageSource as language,
       COUNT(*) as count
     FROM
-      wordProgress wp
-    INNER JOIN word w ON w.id = wp.word_id
-    INNER JOIN topic t ON t.id = w.topic_id
+    WordProgress wp
+    INNER JOIN Word w ON w.id = wp.word_id
+    INNER JOIN Topic t ON t.id = w.topic_id
     WHERE
       wp.user_id = ${user_id}
       ${wordStatusFilter}
