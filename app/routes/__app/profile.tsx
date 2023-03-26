@@ -1,14 +1,15 @@
 import { Box, Button, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import { Container } from '@mui/system';
-import { ActionFunctionArgs, invariant, LoaderFunctionArgs } from '@remix-run/router';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
+import { invariant } from '@remix-run/router';
 
 import { json } from '@remix-run/node';
 import { Form, useLoaderData, useTransition } from '@remix-run/react';
 import UserAvatar from '~/components/UserAvatar';
-import { changeUserAvatar } from '~/models/user.server';
+import { changeUserAvatar, updateUserLearningMode } from '~/models/user.server';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
-import { db } from '~/utils/db.server';
+import { recalcTopicProgress } from '~/models/topics.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -40,13 +41,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         'Invalid learning mode'
       );
 
-      await db.user.update({
-        where: { id: user.id },
-        data: {
-          learningMode: Number(learningMode),
-        },
-      });
-      // TODO recalc topic progress based on new learning mode
+      await updateUserLearningMode(user.id, Number(learningMode));
+      await recalcTopicProgress(user.id, Number(learningMode));
       break;
     default:
       break;

@@ -187,3 +187,12 @@ export async function getUserSessions(user_id: number, date: Date) {
     },
   });
 }
+
+export async function updateUserLearningMode(user_id: number, learningMode: number) {
+  await db.user.update({
+    where: { id: user_id },
+    data: {
+      learningMode,
+    },
+  });
+}
