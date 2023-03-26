@@ -3,8 +3,7 @@ import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { db } from '~/utils/db.server';
 import { invariant } from '@remix-run/router';
-import type { WordWithProgress } from '~/models/words.server';
-import { getWordForStudying } from '~/models/words.server';
+
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
 import { Box, LinearProgress } from '@mui/material';
@@ -12,6 +11,8 @@ import { WordCard } from '~/components/WordCard';
 import { useState } from 'react';
 import { arrayMoveMutable } from '~/utils/helpers';
 import { Completed } from '~/components/Completed';
+import type { WordWithProgress } from '~/services/word-progress.service.server';
+import { WordProgressService } from '~/services/word-progress.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -34,7 +35,7 @@ export async function loader({ request, params }: LoaderArgs) {
 
   invariant(topic, 'Topic not found');
 
-  const words = await getWordForStudying(topic.id, user);
+  const words = await WordProgressService.getWordForStudying(topic.id, user);
 
   invariant(words.length > 0, 'No words to study');
 

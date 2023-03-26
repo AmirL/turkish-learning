@@ -1,5 +1,5 @@
 import { Avatar } from '@mui/material';
-import type { User } from '~/models/user.server';
+import type { User } from '~/services/user.service.server';
 
 interface Props {
   user: User;

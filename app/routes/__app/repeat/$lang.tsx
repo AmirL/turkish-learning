@@ -1,9 +1,7 @@
 import axios from 'axios';
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import { db } from '~/utils/db.server';
 import { invariant } from '@remix-run/router';
-import { LearningMode, WordWithProgress } from '~/models/words.server';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
 import { Box, LinearProgress } from '@mui/material';
@@ -11,6 +9,9 @@ import { WordCard } from '~/components/WordCard';
 import { useState } from 'react';
 import { arrayMoveMutable } from '~/utils/helpers';
 import { Completed } from '~/components/Completed';
+import type { WordWithProgress } from '~/services/word-progress.service.server';
+import { WordProgressService } from '~/services/word-progress.service.server';
+
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -22,61 +23,11 @@ type Word = SerializeFrom<WordWithProgress>;
 
 export async function loader({ request, params }: LoaderArgs) {
   const user = await requireUser(request);
-
   const { lang } = params;
-
   invariant(lang, 'Language is required');
 
-  let isReversed: boolean | undefined;
-  switch (user.learningMode) {
-    case LearningMode.normal:
-      isReversed = false;
-      break;
-    case LearningMode.reverse:
-      isReversed = true;
-      break;
-    case LearningMode.both:
-      isReversed = undefined;
-      break;
-  }
-
-  // get all words with nextReview <= now and current language
-  const words = await db.wordProgress.findMany({
-    where: {
-      user_id: user.id,
-      nextReview: {
-        lte: new Date(),
-      },
-      isReversed,
-      word: {
-        topic: {
-          languageSource: lang,
-        },
-      },
-    },
-    include: {
-      word: {
-        include: {
-          topic: true,
-        },
-      },
-    },
-  });
-
-  // prepare WordWithProgress objects
-  const wordsWithProgress = words.map((wordProgress) => ({
-    id: wordProgress.word.id,
-    word: !wordProgress.isReversed ? wordProgress.word.word : wordProgress.word.translation,
-    translation: !wordProgress.isReversed ? wordProgress.word.translation : wordProgress.word.word,
-    topic: wordProgress.word.topic,
-    isReversed: wordProgress.isReversed,
-    level: wordProgress.level,
-    wrong: wordProgress.wrong,
-  }));
-
+  const wordsWithProgress = await WordProgressService.findWordsToRepeat(user.id, lang, user.learningMode);
   const totalWords = wordsWithProgress.length;
-
-  // randomize words
   wordsWithProgress.sort(() => Math.random() - 0.5);
 
   return {

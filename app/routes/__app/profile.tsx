@@ -8,9 +8,9 @@ import { Form, useLoaderData, useTransition } from '@remix-run/react';
 import UserAvatar from '~/components/UserAvatar';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
-import { recalcTopicProgress } from '~/models/topics.server';
 import { UserService } from '~/services/user.service.server';
 import { AvatarService } from '~/services/avatar.service.server';
+import { TopicProgressService } from '~/services/topic-progress.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -44,7 +44,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       );
 
       await UserService.updateUserLearningMode(user.id, Number(learningMode));
-      await recalcTopicProgress(user.id, Number(learningMode));
+      await TopicProgressService.recalcTopicProgress(user.id, Number(learningMode));
       break;
     default:
       break;

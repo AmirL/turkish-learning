@@ -4,10 +4,10 @@ import { requireUser } from '~/utils/auth.server';
 import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { styled } from '@mui/system';
-import type { TopicInfo } from '~/models/topics.server';
-import { getTopics } from '~/models/topics.server';
 import { getLanguageLabel } from '~/utils/strings';
 import WordsCountIcon from '@mui/icons-material/FeaturedPlayList';
+import type { TopicInfo } from '~/services/topic-progress.service.server';
+import { TopicProgressService } from '~/services/topic-progress.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -18,7 +18,7 @@ export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
   // get topics from db and group them by language source
-  const topics = await getTopics(user.id);
+  const topics = await TopicProgressService.getTopics(user.id);
 
   // get unique language sources from these topics
   const languages = [...new Set(topics.map((topic) => topic.languageSource))];

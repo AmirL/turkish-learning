@@ -3,6 +3,8 @@ import { json } from 'react-router';
 import { requireUser } from '~/utils/auth.server';
 import { invariant } from '@remix-run/router';
 import { db } from '~/utils/db.server';
+import { WordProgressService } from '~/services/word-progress.service.server';
+import { TopicProgressService } from '~/services/topic-progress.service.server';
 
 export const action: ActionFunction = async ({ request, params }) => {
   const user = await requireUser(request);
@@ -18,33 +20,11 @@ export const action: ActionFunction = async ({ request, params }) => {
   const { completed } = await request.json();
   invariant(typeof completed === 'boolean', 'Completed is required');
 
-  await db.topicProgress.upsert({
-    where: { user_id_topic_id: { user_id: user.id, topic_id: topic.id } },
-    update: {
-      completed,
-    },
-    create: {
-      completed,
-      user_id: user.id,
-      topic_id: topic.id,
-    },
-  });
+  TopicProgressService.updateTopicProgress(user.id, topic.id, completed);
 
+  const nextReview = new Date(Date.now() + 24 * 60 * 60 * 1000);
   // set wordProgress nextReview to tomorrow for all words with level < 5 for this topic
-  await db.wordProgress.updateMany({
-    where: {
-      user_id: user.id,
-      word: {
-        topic_id: topic.id,
-      },
-      level: {
-        lt: 5,
-      },
-    },
-    data: {
-      nextReview: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    },
-  });
+  WordProgressService.updateNextReviewByTopic(user.id, topic.id, nextReview, 5);
 
   return json({}, 200);
 };

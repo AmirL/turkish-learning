@@ -8,15 +8,15 @@ import { requireUser } from '~/utils/auth.server';
 import UserAvatar from '~/components/UserAvatar';
 import NavBar from '~/components/NavBar';
 import { styled } from '@mui/system';
-import { languagesToRepeat } from '~/models/words.server';
-import { createContext, useState } from 'react';
+import { useState } from 'react';
 import { AppContext } from '~/components/AppContext';
+import { WordProgressService } from '~/services/word-progress.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
-  const repeatLanguages = await languagesToRepeat(user);
+  const repeatLanguages = await WordProgressService.languagesToRepeat(user);
   // summ languages count
   const repeatCount = repeatLanguages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
 

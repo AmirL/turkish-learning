@@ -10,6 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { invariant } from '@remix-run/router';
 import Papa from 'papaparse';
 import style from '~/css/importCsv.css';
+import type { ImportWordRow } from '~/services/word.service.server';
+
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export function links() {
@@ -23,14 +25,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   return json({});
-};
-
-export type Row = {
-  word: string;
-  translation: string;
-  languageSource: string;
-  languageTarget: string;
-  topic: string;
 };
 
 export const action: ActionFunction = async ({ request }: ActionArgs) => {
@@ -50,7 +44,7 @@ export const action: ActionFunction = async ({ request }: ActionArgs) => {
     return json({ errors: ['No text in file'], table: null });
   }
 
-  const parsed = Papa.parse<Row[]>(text, { header: true });
+  const parsed = Papa.parse<ImportWordRow[]>(text, { header: true });
 
   if (parsed.errors.length > 0) {
     console.log(parsed.errors);
@@ -102,7 +96,7 @@ export default function ImportFromCsv() {
     </>
   );
 }
-function PreviewImportForm({ table }: { table: Row[] }) {
+function PreviewImportForm({ table }: { table: ImportWordRow[] }) {
   return (
     <Form method="post" action="process">
       <Stack spacing={2} sx={{ mt: 2 }}>
@@ -115,7 +109,7 @@ function PreviewImportForm({ table }: { table: Row[] }) {
   );
 }
 
-function PreviewTable({ table }: { table: Row[] }) {
+function PreviewTable({ table }: { table: ImportWordRow[] }) {
   // show topic, languageSource, languageTarget before the table
   // and render the table without these columns
   const { topic, languageSource, languageTarget } = table[0];
@@ -145,7 +139,7 @@ function PreviewTable({ table }: { table: Row[] }) {
   );
 }
 
-function PreviewImportedData({ table }: { table: Row[] }) {
+function PreviewImportedData({ table }: { table: ImportWordRow[] }) {
   // group rows by topic, languageSource, languageTarget
   const grouped = table.reduce((acc, row) => {
     const key = `${row.topic}-${row.languageSource}-${row.languageTarget}`;
@@ -154,7 +148,7 @@ function PreviewImportedData({ table }: { table: Row[] }) {
     }
     acc[key].push(row);
     return acc;
-  }, {} as Record<string, Row[]>);
+  }, {} as Record<string, ImportWordRow[]>);
 
   // render table for each group
   return (

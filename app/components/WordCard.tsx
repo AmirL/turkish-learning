@@ -2,12 +2,12 @@ import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import type { SerializeFrom } from '@remix-run/node';
 import { useEffect, useState } from 'react';
 import { styled } from '@mui/system';
-import type { WordWithProgress } from '~/models/words.server';
 import { SpeakText } from './SpeakText';
 import type { User } from '@prisma/client';
 import axios from 'axios';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import type { WordWithProgress } from '~/services/word-progress.service.server';
 
 type WordCardProps = {
   word: SerializeFrom<WordWithProgress>;

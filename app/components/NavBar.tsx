@@ -2,7 +2,6 @@ import { Badge, BottomNavigation, BottomNavigationAction, Paper } from '@mui/mat
 import { Link, useLocation } from '@remix-run/react';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import type { User } from '~/models/user.server';
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import type { SerializeFrom } from '@remix-run/node';
@@ -10,6 +9,7 @@ import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import LoopIcon from '@mui/icons-material/Loop';
 import { useContext } from 'react';
 import { AppContext } from './AppContext';
+import type { User } from '~/services/user.service.server';
 
 type NavBarItem = {
   label: string;

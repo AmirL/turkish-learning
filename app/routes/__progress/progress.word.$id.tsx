@@ -3,8 +3,8 @@ import { json } from 'react-router';
 import { requireUser } from '~/utils/auth.server';
 import { invariant } from '@remix-run/router';
 import { db } from '~/utils/db.server';
-import { updateWordProgress } from '~/models/words.server';
-import { updateStudySession } from '~/models/studySession.server';
+import { StudySessionService } from '~/services/study-session.service.server';
+import { WordProgressService } from '~/services/word-progress.service.server';
 
 export const action: ActionFunction = async ({ request, params }) => {
   const user = await requireUser(request);
@@ -25,9 +25,9 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const language = word.topic?.languageSource ?? 'en';
 
-  await updateWordProgress({ correct, level, user_id: user.id, word_id: word.id, isReversed });
+  await WordProgressService.updateWordProgress({ correct, level, user_id: user.id, word_id: word.id, isReversed });
 
-  await updateStudySession(user, language, correct);
+  await StudySessionService.updateStudySession(user.id, language, correct);
 
   return json({}, 200);
 };

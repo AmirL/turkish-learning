@@ -2,7 +2,7 @@ import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 import { sessionStorage } from '~/utils/session.server';
 import { invariant, redirect } from '@remix-run/router';
-import type { User } from '~/models/user.server';
+import type { User } from '~/services/user.service.server';
 import { UserService } from '~/services/user.service.server';
 
 // Create an instance of the authenticator, pass a Type, User,  with what
