@@ -1,10 +1,11 @@
 import type { LoaderFunction, ActionFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
-import authenticator, { getLoggedUser, login } from '~/utils/auth.server';
+import { authenticator, login } from '~/utils/auth.server';
 import { json } from '@remix-run/node';
 import { Form, Link, useActionData, useTransition } from '@remix-run/react';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
+import { UserService } from '~/services/user.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -12,7 +13,7 @@ export const handle = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getLoggedUser(request);
+  const user = await UserService.getLoggedUser(request);
   if (user) return redirect('/');
 
   return json({});

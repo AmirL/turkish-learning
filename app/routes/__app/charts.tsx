@@ -28,14 +28,9 @@ import { Box } from '@mui/system';
 import { Grid } from '@mui/material';
 import KnownWordsChart from '~/components/charts/KnownWordsChart';
 import RepeatRememberChart from '~/components/charts/RepeatRememberChart';
-import {
-  getUserLastKnownWords,
-  getUserLastWellKnownWords,
-  getUserSessions,
-  getUserStudyingLanguages,
-  getUserTotalWords,
-  TotalWordsCount,
-} from '~/models/user.server';
+
+import { StudySessionService } from '~/services/study-session.service.server';
+import { TotalWordsCount, WordProgressService } from '~/services/word-progress.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -48,20 +43,20 @@ export async function loader({ request }: LoaderArgs) {
 
   const FilterDate = new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000);
   // load sessions grouped by language and date
-  const sessions = await getUserSessions(user.id, FilterDate);
+  const sessions = await StudySessionService.getUserSessions(user.id, FilterDate);
 
   // reverse sessions to show them in chronological order
   sessions.reverse();
 
   // get languages from studySessions
-  const languages = await getUserStudyingLanguages(user.id);
+  const languages = await StudySessionService.getUserStudyingLanguages(user.id);
 
   // get last known words for each language
-  const lastKnownWords = await getUserLastKnownWords(user.id, 50);
-  const lastWellKnownWords = await getUserLastWellKnownWords(user.id, 50);
+  const lastKnownWords = await WordProgressService.getUserLastKnownWords(user.id, 50);
+  const lastWellKnownWords = await WordProgressService.getUserLastWellKnownWords(user.id, 50);
 
-  const totalKnownWords = await getUserTotalWords(user.id, 'known');
-  const totalWellKnownWords = await getUserTotalWords(user.id, 'wellKnown');
+  const totalKnownWords = await WordProgressService.getUserTotalWords(user.id, 'known');
+  const totalWellKnownWords = await WordProgressService.getUserTotalWords(user.id, 'wellKnown');
 
   return json({ sessions, languages, lastKnownWords, lastWellKnownWords, totalKnownWords, totalWellKnownWords }, 200);
 }

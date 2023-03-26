@@ -1,10 +1,11 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
 import { Form, Link, useSearchParams, useActionData, useTransition } from '@remix-run/react';
-import { createUser, getUserByEmail } from '~/models/user.server';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
-import { getLoggedUser, login } from '~/utils/auth.server';
+import { login } from '~/utils/auth.server';
+import { UserService } from '~/services/user.service.server';
+import { AvatarService } from '~/services/avatar.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -12,7 +13,7 @@ export const handle = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getLoggedUser(request);
+  const user = await UserService.getLoggedUser(request);
   if (user) return redirect('/');
   return json({});
 };
@@ -50,7 +51,7 @@ export const action: ActionFunction = async ({ request }) => {
     return badRequest({ fieldErrors, fields, formError: null });
   }
 
-  const existingUser = await getUserByEmail(email);
+  const existingUser = await UserService.getUserByEmail(email);
   if (existingUser) {
     return badRequest({
       fieldErrors: null,
@@ -59,7 +60,8 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  const user = await createUser(email, password, name);
+  const avatar = await AvatarService.generateRandomAvatarImage();
+  const user = await UserService.createUser(email, password, name, avatar);
   return await login(user, request, redirectTo);
 };
 

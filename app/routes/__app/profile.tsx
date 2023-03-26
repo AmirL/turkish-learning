@@ -6,10 +6,11 @@ import { invariant } from '@remix-run/router';
 import { json } from '@remix-run/node';
 import { Form, useLoaderData, useTransition } from '@remix-run/react';
 import UserAvatar from '~/components/UserAvatar';
-import { changeUserAvatar, updateUserLearningMode } from '~/models/user.server';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
 import { recalcTopicProgress } from '~/models/topics.server';
+import { UserService } from '~/services/user.service.server';
+import { AvatarService } from '~/services/avatar.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -31,7 +32,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   switch (action) {
     case 'avatar':
-      await changeUserAvatar(user.id);
+      const newAvatar = await AvatarService.generateRandomAvatarImage();
+      await UserService.changeUserAvatar(user.id, newAvatar);
       break;
     case 'settings':
       const learningMode = formData.get('learningMode');
@@ -41,7 +43,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         'Invalid learning mode'
       );
 
-      await updateUserLearningMode(user.id, Number(learningMode));
+      await UserService.updateUserLearningMode(user.id, Number(learningMode));
       await recalcTopicProgress(user.id, Number(learningMode));
       break;
     default:

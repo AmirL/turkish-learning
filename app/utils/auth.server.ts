@@ -3,12 +3,11 @@ import { FormStrategy } from 'remix-auth-form';
 import { sessionStorage } from '~/utils/session.server';
 import { invariant, redirect } from '@remix-run/router';
 import type { User } from '~/models/user.server';
-import { verifyLogin } from '~/models/user.server';
-import { db } from './db.server';
+import { UserService } from '~/services/user.service.server';
 
 // Create an instance of the authenticator, pass a Type, User,  with what
 // strategies will return and will store in the session
-const authenticator = new Authenticator<User | Error | null>(sessionStorage);
+export const authenticator = new Authenticator<User | Error | null>(sessionStorage);
 
 authenticator.use(
   new FormStrategy(async ({ form, context }) => {
@@ -24,14 +23,12 @@ authenticator.use(
     invariant(typeof password === 'string', 'password must be a string');
     invariant(password.length > 0, 'password must not be empty');
 
-    const user = await verifyLogin(username, password);
+    const user = await UserService.verifyLogin(username, password);
     invariant(user, 'Invalid username or password');
 
     return user;
   })
 );
-
-export default authenticator;
 
 /**
  * @param request
@@ -46,7 +43,8 @@ export async function getLoggedUser(request: Request) {
   }
 
   if (userFromCookies) {
-    return await db.user.findUnique({ where: { id: userFromCookies.id } });
+    //return await db.user.findUnique({ where: { id: userFromCookies.id } });
+    return await UserService.getUserById(userFromCookies.id);
   }
 
   return null;
@@ -64,7 +62,8 @@ export async function requireUser(request: Request) {
   }
 
   // always check user in DB to get the latest data for access control
-  const user = await db.user.findUnique({ where: { id: userFromCookies.id } });
+  // const user = await db.user.findUnique({ where: { id: userFromCookies.id } });
+  const user = await UserService.getUserById(userFromCookies.id);
 
   if (!user) {
     throw redirect('/login');
@@ -85,15 +84,3 @@ export async function login(user: User, request: Request, redirectTo: FormDataEn
     headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
   });
 }
-
-// export async function updateUserSession(user: User, request: Request) {
-//   let session = await sessionStorage.getSession(request.headers.get('Cookie'));
-
-//   // don't store avatar in session
-//   user.avatar = '';
-
-//   session.set(authenticator.sessionKey, user);
-//   return redirect('/profile', {
-//     headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
-//   });
-// }

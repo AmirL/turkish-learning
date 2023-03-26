@@ -7,7 +7,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
 import { invariant } from '@remix-run/router';
 import CloseDialogButton from '~/components/CloseDialogButton';
 import UserAvatar from '~/components/UserAvatar';
-import { hashPassword } from '~/models/user.server';
+import { UserService } from '~/services/user.service.server';
 
 import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
@@ -69,7 +69,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     if (password !== passwordConfirm) {
       return badRequest({ error: 'Passwords do not match', success: false });
     }
-    data.password = await hashPassword(password);
+    data.password = await UserService.hashPassword(password);
   }
 
   await db.user.update({

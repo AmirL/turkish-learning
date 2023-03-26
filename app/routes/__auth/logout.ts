@@ -1,6 +1,6 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
-import authenticator from '~/utils/auth.server';
+import { authenticator } from '~/utils/auth.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const action: ActionFunction = async ({ request }) => {
