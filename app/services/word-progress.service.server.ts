@@ -70,6 +70,7 @@ export class WordProgressService {
         known: {
           not: null,
         },
+        wellKnown: null,
       },
       include: {
         word: {
