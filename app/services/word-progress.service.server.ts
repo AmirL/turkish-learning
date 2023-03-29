@@ -70,7 +70,6 @@ export class WordProgressService {
         known: {
           not: null,
         },
-        wellKnown: null,
       },
       include: {
         word: {
@@ -91,7 +90,7 @@ export class WordProgressService {
 
     switch (status) {
       case 'known':
-        wordStatusFilter = Prisma.sql`AND wp.known IS NOT NULL`;
+        wordStatusFilter = Prisma.sql`AND wp.known IS NOT NULL AND wp.wellKnown IS NULL`;
         break;
       case 'wellKnown':
         wordStatusFilter = Prisma.sql`AND wp.wellKnown IS NOT NULL`;
