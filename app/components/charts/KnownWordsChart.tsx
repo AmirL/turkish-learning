@@ -29,7 +29,7 @@ export default function KnownWordsChart({ sessions }: { sessions: SerializeFrom<
       },
       {
         label: 'Known words',
-        data: sessions.map((session) => session.known),
+        data: sessions.map((session) => session.known - session.wellKnown),
         borderRadius: 15,
         backgroundColor: ['#A5C0B3'],
         borderColor: ['#49674C'],

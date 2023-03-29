@@ -3,7 +3,6 @@
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { requireUser } from '~/utils/auth.server';
-import { db } from '~/utils/db.server';
 
 import {
   Chart as ChartJS,
@@ -19,10 +18,9 @@ import {
   TimeScale,
 } from 'chart.js';
 
-import { Line, Bar } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
 import { Link, useLoaderData } from '@remix-run/react';
-import type { StudySession, Topic, User, Word, WordProgress } from '@prisma/client';
+import type { StudySession, Topic, Word, WordProgress } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
 import { Box } from '@mui/system';
 import { Grid } from '@mui/material';
@@ -30,7 +28,8 @@ import KnownWordsChart from '~/components/charts/KnownWordsChart';
 import RepeatRememberChart from '~/components/charts/RepeatRememberChart';
 
 import { StudySessionService } from '~/services/study-session.service.server';
-import { TotalWordsCount, WordProgressService } from '~/services/word-progress.service.server';
+import type { TotalWordsCount} from '~/services/word-progress.service.server';
+import { WordProgressService } from '~/services/word-progress.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
