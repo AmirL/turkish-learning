@@ -1,5 +1,5 @@
 import { db } from '~/utils/db.server';
-import { ImportWordRow } from './word.service.server';
+import type { ImportWordRow } from './word.service.server';
 
 export class TopicService {
   static async createTopics(table: ImportWordRow[]) {

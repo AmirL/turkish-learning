@@ -18,7 +18,7 @@ export class WordService {
   }
 
   static async importWords(table: ImportWordRow[]) {
-    TopicService.createTopics(table);
+    await TopicService.createTopics(table);
 
     const uniqueTopicNames = [...new Set(table.map((topic) => topic.topic))];
 
