@@ -2,6 +2,8 @@ import { db } from '~/utils/db.server';
 import type { SerializeFrom } from '@remix-run/node';
 import type { Topic, User, Word, WordProgress } from '@prisma/client';
 import { Prisma } from '@prisma/client';
+import { WordService } from './word.service.server';
+import { sortRandom } from '~/utils/arrays';
 
 export type WordStatus = 'known' | 'wellKnown';
 
@@ -128,24 +130,66 @@ export class WordProgressService {
     return parseInt(knownWordsRes[0].knownWords, 10);
   }
 
-  static async getWordForStudying(topicId: number, user: User) {
-    const words = await db.word.findMany({
-      include: {
-        topic: true,
-      },
-      where: {
-        topic_id: Number(topicId),
-      },
-    });
+  static async getWordsForStudying(topicId: number, user: User) {
+    const words = await WordService.getWordsByTopicId(topicId);
 
     if (words.length === 0) {
       return [];
     }
 
+    let withDirection: WordWithProgress[] = WordProgressService.getWordVariantsByLearningMode(user.learningMode, words);
+
+    // load word progress for current user
+    const wordProgressMap = await WordProgressService.getWordsProgress(user.id, words);
+
+    // add level and wrong to each word
+    WordProgressService.addProgressToWords(withDirection, wordProgressMap);
+
+    // order words randomly
+    withDirection = sortRandom(withDirection);
+
+    return withDirection;
+  }
+
+  private static addProgressToWords(withDirection: WordWithProgress[], wordProgressMap: Map<any, any>) {
+    withDirection.forEach((word) => {
+      const progress = wordProgressMap.get(`${word.id}-${word.isReversed}`);
+      if (progress) {
+        word.level = progress.level;
+        word.wrong = progress.wrong;
+      }
+    });
+  }
+
+  private static async getWordsProgress(user_id: number, words: (Word & { topic: Topic })[]) {
+    const wordProgress = await db.wordProgress.findMany({
+      select: {
+        word_id: true,
+        level: true,
+        isReversed: true,
+        wrong: true,
+      },
+      where: {
+        user_id,
+        word_id: {
+          in: words.map((word) => word.id),
+        },
+      },
+    });
+
+    // // create a map with wordId and isReversed as key and level as value
+    const wordProgressMap = new Map();
+    wordProgress.forEach((progress) => {
+      wordProgressMap.set(`${progress.word_id}-${progress.isReversed}`, progress);
+    });
+    return wordProgressMap;
+  }
+
+  private static getWordVariantsByLearningMode(learningMode: number, words: (Word & { topic: Topic })[]) {
     let withDirection: WordWithProgress[] = [];
 
     // make new array with words with 2 varuant of direction variable
-    if (user.learningMode === LearningMode.normal || user.learningMode === LearningMode.both) {
+    if (learningMode === LearningMode.normal || learningMode === LearningMode.both) {
       withDirection = [
         ...words.map((word) => ({
           ...word,
@@ -156,7 +200,7 @@ export class WordProgressService {
       ];
     }
 
-    if (user.learningMode === LearningMode.reverse || user.learningMode === LearningMode.both) {
+    if (learningMode === LearningMode.reverse || learningMode === LearningMode.both) {
       withDirection = [
         ...withDirection,
         ...words.map((word) => ({
@@ -169,41 +213,6 @@ export class WordProgressService {
         })),
       ];
     }
-
-    // load word progress for current user
-    const wordProgress = await db.wordProgress.findMany({
-      select: {
-        word_id: true,
-        level: true,
-        isReversed: true,
-        wrong: true,
-      },
-      where: {
-        user_id: user.id,
-        word_id: {
-          in: words.map((word) => word.id),
-        },
-      },
-    });
-
-    // // create a map with wordId and isReversed as key and level as value
-    const wordProgressMap = new Map();
-    wordProgress.forEach((progress) => {
-      wordProgressMap.set(`${progress.word_id}-${progress.isReversed}`, progress);
-    });
-
-    // add level to each word
-    withDirection.forEach((word) => {
-      const progress = wordProgressMap.get(`${word.id}-${word.isReversed}`);
-      if (progress) {
-        word.level = progress.level;
-        word.wrong = progress.wrong;
-      }
-    });
-
-    // order words randomly
-    withDirection.sort(() => Math.random() - 0.5);
-
     return withDirection;
   }
 
