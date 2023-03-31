@@ -1,7 +1,7 @@
 import type { ActionFunction } from '@remix-run/node';
 import { json } from 'react-router';
 import { requireUser } from '~/utils/auth.server';
-import { invariant } from '@remix-run/router';
+import invariant from 'ts-invariant';
 import { db } from '~/utils/db.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
 import { TopicProgressService } from '~/services/topic-progress.service.server';

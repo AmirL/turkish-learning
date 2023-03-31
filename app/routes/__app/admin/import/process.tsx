@@ -3,7 +3,8 @@ process parsed data from previous step (from preview), and create actually words
 */
 import type { ActionFunction } from '@remix-run/node';
 import { requireUser } from '~/utils/auth.server';
-import { invariant, json } from '@remix-run/router';
+import { json } from '@remix-run/router';
+import invariant from 'ts-invariant';
 
 import { Link, useActionData } from '@remix-run/react';
 import { Box } from '@mui/system';

@@ -1,7 +1,7 @@
 import bcrypt from '@node-rs/bcrypt';
 import type { User } from '@prisma/client';
 import { redirect } from '@remix-run/node';
-import { invariant } from '@remix-run/router';
+import invariant from 'ts-invariant';
 import { authenticator } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
 export type { User } from '@prisma/client';

@@ -7,10 +7,10 @@ import { Form, useActionData, useTransition } from '@remix-run/react';
 import { requireUser } from '~/utils/auth.server';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 
-import { invariant } from '@remix-run/router';
 import Papa from 'papaparse';
 import style from '~/css/importCsv.css';
 import type { ImportWordRow } from '~/services/word.service.server';
+import invariant from 'ts-invariant';
 
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 

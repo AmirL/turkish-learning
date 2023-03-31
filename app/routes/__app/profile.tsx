@@ -1,7 +1,7 @@
 import { Box, Button, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
-import { invariant } from '@remix-run/router';
+import invariant from 'ts-invariant';
 
 import { json } from '@remix-run/node';
 import { Form, useLoaderData, useTransition } from '@remix-run/react';

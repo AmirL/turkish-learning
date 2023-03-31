@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { db } from '~/utils/db.server';
-import { invariant } from '@remix-run/router';
+import invariant from 'ts-invariant';
 
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';

@@ -13,7 +13,7 @@ import {
 import { json, redirect } from '@remix-run/node';
 import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
-import { invariant } from '@remix-run/router';
+import invariant from 'ts-invariant';
 import CloseDialogButton from '~/components/CloseDialogButton';
 
 import { requireUser } from '~/utils/auth.server';
