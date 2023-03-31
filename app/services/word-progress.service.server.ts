@@ -1,6 +1,6 @@
 import { db } from '~/utils/db.server';
 import type { SerializeFrom } from '@remix-run/node';
-import type { Topic, User, Word, WordProgress } from '@prisma/client';
+import type { Topic, User, Word } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { WordService } from './word.service.server';
 import { sortRandom } from '~/utils/arrays';
@@ -137,7 +137,7 @@ export class WordProgressService {
       return [];
     }
 
-    let withDirection: WordWithProgress[] = WordProgressService.getWordVariantsByLearningMode(user.learningMode, words);
+    let withDirection = WordProgressService.getWordVariantsByLearningMode(user.learningMode, words);
 
     // load word progress for current user
     const wordProgressMap = await WordProgressService.getWordsProgress(user.id, words);
@@ -185,7 +185,7 @@ export class WordProgressService {
     return wordProgressMap;
   }
 
-  private static getWordVariantsByLearningMode(learningMode: number, words: (Word & { topic: Topic })[]) {
+  static getWordVariantsByLearningMode(learningMode: number, words: (Word & { topic: Topic })[]) {
     let withDirection: WordWithProgress[] = [];
 
     // make new array with words with 2 varuant of direction variable
