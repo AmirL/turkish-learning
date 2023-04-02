@@ -13,6 +13,8 @@ import { arrayMoveMutable } from '~/utils/helpers';
 import { Completed } from '~/components/Completed';
 import type { WordWithProgress } from '~/services/word-progress.service.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
+import { sortRandom } from '~/utils/arrays';
+import { WordService } from '~/services/word.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -25,29 +27,33 @@ type Word = SerializeFrom<WordWithProgress>;
 export async function loader({ request, params }: LoaderArgs) {
   const user = await requireUser(request);
 
-  const { topicId } = params;
-
-  invariant(topicId, 'Topic ID is required');
+  invariant(params.topicId, 'Topic ID is required');
+  const topicId = parseInt(params.topicId);
 
   const topic = await db.topic.findUnique({
     where: { id: Number(topicId) },
   });
-
   invariant(topic, 'Topic not found');
 
-  const words = await WordProgressService.getWordsForStudying(topic.id, user);
+  let topicWords = await WordService.getWordsByTopicId(topicId);
+  invariant(topicWords.length > 0, 'No words in topic');
 
+  let words = await WordProgressService.getWordsProgress(topicWords, user.id, user.learningMode);
   invariant(words.length > 0, 'No words to study');
 
+  // save total words count including words with level 5 and higher
   const totalWords = words.length;
 
-  // remove words with level 5 and higher
-  const wordToStudy = words.filter((word) => word.level < 5);
+  // remove words with level 5 and higher, not need to study them anymore
+  words = words.filter((word) => word.level < 5);
+
+  // sort words randomly
+  words = sortRandom(words);
 
   return {
     totalWords,
     topic,
-    words: wordToStudy,
+    words,
     user,
   };
 }

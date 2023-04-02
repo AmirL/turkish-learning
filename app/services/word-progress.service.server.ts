@@ -41,6 +41,8 @@ type UpdateWordProgressParams = {
   isReversed: boolean;
 };
 
+export type WordWithTopic = Word & { topic: Topic };
+
 export class WordProgressService {
   static async getUserLastWellKnownWords(user_id: number, count: number) {
     return await db.wordProgress.findMany({
@@ -130,38 +132,19 @@ export class WordProgressService {
     return parseInt(knownWordsRes[0].knownWords, 10);
   }
 
-  static async getWordsForStudying(topicId: number, user: User) {
-    const words = await WordService.getWordsByTopicId(topicId);
-
-    if (words.length === 0) {
-      return [];
-    }
-
-    let withDirection = WordProgressService.getWordVariantsByLearningMode(user.learningMode, words);
-
-    // load word progress for current user
-    const wordProgressMap = await WordProgressService.getWordsProgress(user.id, words);
-
-    // add level and wrong to each word
-    WordProgressService.addProgressToWords(withDirection, wordProgressMap);
-
-    // order words randomly
-    withDirection = sortRandom(withDirection);
-
-    return withDirection;
-  }
-
-  private static addProgressToWords(withDirection: WordWithProgress[], wordProgressMap: Map<any, any>) {
-    withDirection.forEach((word) => {
-      const progress = wordProgressMap.get(`${word.id}-${word.isReversed}`);
-      if (progress) {
-        word.level = progress.level;
-        word.wrong = progress.wrong;
-      }
-    });
-  }
-
-  private static async getWordsProgress(user_id: number, words: (Word & { topic: Topic })[]) {
+  /**
+   * Get words with progress for user, depending on learning mode
+   *
+   * @param words - words to get progress for
+   * @param user_id
+   * @param learningMode (normal, reverse, both)
+   * @returns
+   */
+  static async getWordsProgress(
+    words: WordWithTopic[],
+    user_id: number,
+    learningMode: number
+  ): Promise<WordWithProgress[]> {
     const wordProgress = await db.wordProgress.findMany({
       select: {
         word_id: true,
@@ -182,10 +165,29 @@ export class WordProgressService {
     wordProgress.forEach((progress) => {
       wordProgressMap.set(`${progress.word_id}-${progress.isReversed}`, progress);
     });
-    return wordProgressMap;
+
+    let wordsWithDirection = WordProgressService.getWordVariantsByLearningMode(learningMode, words);
+    wordsWithDirection.forEach((word) => {
+      const progress = wordProgressMap.get(`${word.id}-${word.isReversed}`);
+      if (progress) {
+        word.level = progress.level;
+        word.wrong = progress.wrong;
+      }
+    });
+
+    return wordsWithDirection;
   }
 
-  static getWordVariantsByLearningMode(learningMode: number, words: (Word & { topic: Topic })[]) {
+  /**
+   * Add variants of words depending on learning mode
+   * @param learningMode
+   *  LearningMode.normal - only normal direction
+   *  LearningMode.reverse - only reverse direction
+   *  LearningMode.both - both directions (normal + reverse)
+   * @param words
+   * @returns
+   */
+  private static getWordVariantsByLearningMode(learningMode: number, words: WordWithTopic[]): WordWithProgress[] {
     let withDirection: WordWithProgress[] = [];
 
     // make new array with words with 2 varuant of direction variable
