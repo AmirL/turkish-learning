@@ -18,6 +18,7 @@ export class TopicService {
       where: { name: { in: uniqueTopics } },
     });
 
+    // topics can have same name, but different languages
     const topicIdsMap = topicsIds.reduce((acc, topic) => {
       if (topic.name) {
         // use name, languageSource, languageTarget as key to avoid duplicates

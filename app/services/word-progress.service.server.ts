@@ -293,7 +293,7 @@ export class WordProgressService {
     return languages;
   }
 
-  static async findWordsToRepeat(user_id: number, lang: string, learningMode: number) {
+  static async findWordsToRepeat(user_id: number, lang: string, learningMode: number): Promise<WordWithProgress[]> {
     let isReversed;
     switch (learningMode) {
       case LearningMode.normal:
