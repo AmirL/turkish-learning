@@ -15,10 +15,10 @@ A mobile-first Progressive Web Application. This flashcard app was created entir
 
 ## Screenshots
 
-<a href="/topics.png"><img src="assets/topics.png" width="200px"></a>
-<a href="/charts.png"><img src="assets/charts.png" width="200px"></a>
-<a href="/studying.png"><img src="assets/studying.png" width="200px"></a>
-<a href="/studying-flipped.png"><img src="assets/studying-flipped.png" width="200px"></a>
-<a href="/profile.png"><img src="assets/profile.png" width="200px"></a>
-<a href="/admin.png"><img src="assets/admin.png" width="200px"></a>
-<a href="/admin-edit-topic.png"><img src="assets/admin-edit-topic.png" width="200px"></a>
+[<img src="assets/topics.png" width="200px">](assets/topics.png)
+[<img src="assets/charts.png" width="200px">](assets/charts.png)
+[<img src="assets/studying.png" width="200px">](assets/studying.png)
+[<img src="assets/studying-flipped.png" width="200px">](assets/studying-flipped.png)
+[<img src="assets/profile.png" width="200px">](assets/profile.png)
+[<img src="assets/admin.png" width="200px">](assets/admin.png)
+[<img src="assets/admin-edit-topic.png" width="200px">](assets/admin-edit-topic.png)
