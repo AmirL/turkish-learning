@@ -11,7 +11,7 @@ A mobile-first Progressive Web Application. This flashcard app was created entir
 - ORM: [Prisma](https://www.prisma.io/)
 - Tests: [Vitest](https://vitest.dev/)
 - DB: [Planetscale](https://planetscale.com/), MySql
-- Host: [Vercel](https://vercel.com/)
+- Hosting: [Vercel](https://vercel.com/)
 
 ## Screenshots
 
