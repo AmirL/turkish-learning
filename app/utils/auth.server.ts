@@ -1,9 +1,10 @@
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 import { sessionStorage } from '~/utils/session.server';
-import { invariant, redirect } from '@remix-run/router';
+import { redirect } from '@remix-run/router';
 import type { User } from '~/services/user.service.server';
 import { UserService } from '~/services/user.service.server';
+import invariant from 'ts-invariant';
 
 // Create an instance of the authenticator, pass a Type, User,  with what
 // strategies will return and will store in the session

@@ -1,5 +1,6 @@
-import { ActionArgs, json } from '@remix-run/node';
-import { invariant } from '@remix-run/router';
+import type { ActionArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import invariant from 'ts-invariant';
 import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
 
