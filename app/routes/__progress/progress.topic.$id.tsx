@@ -20,11 +20,11 @@ export const action: ActionFunction = async ({ request, params }) => {
   const { completed } = await request.json();
   invariant(typeof completed === 'boolean', 'Completed is required');
 
-  TopicProgressService.updateTopicProgress(user.id, topic.id, completed);
+  await TopicProgressService.updateTopicProgress(user.id, topic.id, completed);
 
   const nextReview = new Date(Date.now() + 24 * 60 * 60 * 1000);
   // set wordProgress nextReview to tomorrow for all words with level < 5 for this topic
-  WordProgressService.updateNextReviewByTopic(user.id, topic.id, nextReview, 5);
+  await WordProgressService.updateNextReviewByTopic(user.id, topic.id, nextReview, 5);
 
   return json({}, 200);
 };
