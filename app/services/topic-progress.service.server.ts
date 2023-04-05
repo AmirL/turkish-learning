@@ -26,7 +26,7 @@ export class TopicProgressService {
   LEFT JOIN TopicProgress tp ON t.id = tp.topic_id AND tp.user_id = ${user_id}
   JOIN Word  w ON t.id = w.topic_id
   GROUP BY t.name, t.languageSource, t.difficulty, t.id, tp.started, tp.completed
-  ORDER BY t.languageSource Desc, t.difficulty ASC
+  ORDER BY t.languageSource Desc, tp.completed ASC, t.difficulty ASC
   `;
 
     return topics;
