@@ -51,7 +51,7 @@ export default function AppLayout() {
   const [repeatBadge, setRepeatBadge] = useState(repeatCount);
 
   return (
-    <AppContext.Provider value={{ repeatCount: repeatBadge, setRepeatCount: setRepeatBadge }}>
+    <AppContext.Provider value={{ repeatCount: repeatBadge, setRepeatCount: setRepeatBadge, user }}>
       <Container maxWidth="sm">
         <TopBarStyled className={simpleBackground ? 'simpleBackground' : ''}>
           <Box
@@ -77,7 +77,7 @@ export default function AppLayout() {
         <Box sx={{ mb: 15, mt: 14 }}>
           <Outlet />
         </Box>
-        <NavBar user={user} />
+        <NavBar />
       </Container>
     </AppContext.Provider>
   );

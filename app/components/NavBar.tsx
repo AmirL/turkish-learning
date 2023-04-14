@@ -4,12 +4,11 @@ import HomeIcon from '@mui/icons-material/Home';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import type { SerializeFrom } from '@remix-run/node';
+
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import LoopIcon from '@mui/icons-material/Loop';
 import { useContext } from 'react';
 import { AppContext } from './AppContext';
-import type { User } from '~/services/user.service.server';
 
 type NavBarItem = {
   label: string;
@@ -17,11 +16,12 @@ type NavBarItem = {
   link: string;
 };
 
-export default function NavBar({ user }: { user: SerializeFrom<User> }) {
+export default function NavBar() {
   const location = useLocation();
 
   const appContext = useContext(AppContext);
   const repeatCount = appContext.repeatCount ?? 0;
+  const user = appContext.user;
 
   const navBar: NavBarItem[] = [
     { label: 'Home', icon: <HomeIcon />, link: '/' },
