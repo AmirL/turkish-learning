@@ -15,6 +15,7 @@ import type { WordWithProgress } from '~/services/word-progress.service.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
 import { sortRandom } from '~/utils/arrays';
 import { WordService } from '~/services/word.service.server';
+import { ListCompleted } from '~/components/ListCompleted';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -42,7 +43,7 @@ export async function loader({ request, params }: LoaderArgs) {
   invariant(words.length > 0, 'No words to study');
 
   // save total words count including words with level 5 and higher
-  const totalWords = words.length;
+  const totalWords = words;
 
   // remove words with level 5 and higher, not need to study them anymore
   words = words.filter((word) => word.level < 5);
@@ -116,10 +117,10 @@ export default function StudyingTopic() {
   let totalLevel = words.reduce((acc, word) => acc + word.level, 0);
 
   // add to total level 5 points for each finished word
-  const finishedWords = totalWords - wordsArray.length;
+  const finishedWords = totalWords.length - wordsArray.length;
   totalLevel += finishedWords * 5;
 
-  const progress = totalLevel / (totalWords * 5);
+  const progress = totalLevel / (totalWords.length * 5);
   const completed = wordsArray.length < 3;
 
   return (
@@ -130,7 +131,10 @@ export default function StudyingTopic() {
       </h3>
 
       {completed ? (
-        <Completed />
+        <>
+          <Completed />
+          <ListCompleted words={totalWords} />
+        </>
       ) : (
         <>
           <LinearProgress variant="determinate" value={progress * 100} />

@@ -2,8 +2,6 @@ import { db } from '~/utils/db.server';
 import type { SerializeFrom } from '@remix-run/node';
 import type { Topic, User, Word } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import { WordService } from './word.service.server';
-import { sortRandom } from '~/utils/arrays';
 
 export type WordStatus = 'known' | 'wellKnown';
 
@@ -19,6 +17,7 @@ export type WordWithProgress = {
   isReversed: boolean;
   level: number;
   wrong: number; // number of wrong answers. Boost level to 4 if answer correct from 1st try
+  nextReview: Date | null;
   topic: SerializeFrom<Topic> | Topic;
 };
 
@@ -151,6 +150,7 @@ export class WordProgressService {
         level: true,
         isReversed: true,
         wrong: true,
+        nextReview: true,
       },
       where: {
         user_id,
@@ -172,6 +172,7 @@ export class WordProgressService {
       if (progress) {
         word.level = progress.level;
         word.wrong = progress.wrong;
+        word.nextReview = progress.nextReview;
       }
     });
 
@@ -198,6 +199,7 @@ export class WordProgressService {
           isReversed: false,
           level: 0,
           wrong: 0,
+          nextReview: null,
         })),
       ];
     }
@@ -212,6 +214,7 @@ export class WordProgressService {
           isReversed: true,
           level: 0,
           wrong: 0,
+          nextReview: null,
         })),
       ];
     }
@@ -338,6 +341,7 @@ export class WordProgressService {
       isReversed: wordProgress.isReversed,
       level: wordProgress.level,
       wrong: wordProgress.wrong,
+      nextReview: wordProgress.nextReview,
     }));
   }
 
