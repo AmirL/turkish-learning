@@ -34,25 +34,17 @@ export async function loader({ request, params }: LoaderArgs) {
   let words = await WordProgressService.getWordsProgress(topicWords, user.id, user.learningMode);
   invariant(words.length > 0, 'No words to study');
 
-  // save total words count including words with level 5 and higher
-  const totalWords = words;
-
-  // remove words with level 5 and higher, not need to study them anymore
-  words = words.filter((word) => word.level < 5);
-
-  // sort words randomly
   words = sortRandom(words);
 
   return {
-    totalWords,
-    topic,
     words,
+    topic,
     user,
   };
 }
 
 export default function Topic() {
-  const { topic, words, totalWords } = useLoaderData<typeof loader>();
+  const { topic, words } = useLoaderData<typeof loader>();
 
   return (
     <Box>
@@ -60,7 +52,7 @@ export default function Topic() {
       <h3>
         {getLanguageLabel(topic.languageSource)} - {getLanguageLabel(topic.languageTarget)}
       </h3>
-      <StudyingTopic topic={topic} words={words} totalWords={totalWords} />
+      <StudyingTopic topic={topic} words={words} />
     </Box>
   );
 }

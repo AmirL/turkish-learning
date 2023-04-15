@@ -60,4 +60,29 @@ describe('StudyingService', () => {
       expect(word.level).toBe(0);
     });
   });
+
+  describe('getProgress', () => {
+    it('it returns 1 if words array is empty', () => {
+      const progress = StudyingService.getProgress([]);
+      expect(progress).toBe(1);
+    });
+
+    it('it returns 1 if all words have level 5', () => {
+      const words = Array.from({ length: 10 }, () => ({ level: 5 }));
+      const progress = StudyingService.getProgress(words);
+      expect(progress).toBe(1);
+    });
+
+    it('it returns 0.2 if 10 words have level 1', () => {
+      const words = Array.from({ length: 10 }, () => ({ level: 1 }));
+      const progress = StudyingService.getProgress(words);
+      expect(progress).toBe(0.2);
+    });
+
+    it('it returns 0 if all words have level 0', () => {
+      const words = Array.from({ length: 10 }, () => ({ level: 0 }));
+      const progress = StudyingService.getProgress(words);
+      expect(progress).toBe(0);
+    });
+  });
 });

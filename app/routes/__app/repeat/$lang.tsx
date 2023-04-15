@@ -1,5 +1,4 @@
-import axios from 'axios';
-import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
+import type { LoaderArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import invariant from 'ts-invariant';
 import { requireUser } from '~/utils/auth.server';
@@ -9,8 +8,8 @@ import { WordCard } from '~/components/WordCard';
 import { useState } from 'react';
 import { arrayMoveMutable } from '~/utils/helpers';
 import { Completed } from '~/components/Completed';
-import type { WordWithProgress } from '~/services/word-progress.service.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
+import { StudyingService } from '~/services/studying-service';
 
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
@@ -19,59 +18,50 @@ export const handle = {
   simpleBackground: true,
 };
 
-type Word = SerializeFrom<WordWithProgress>;
-
 export async function loader({ request, params }: LoaderArgs) {
   const user = await requireUser(request);
   const { lang } = params;
   invariant(lang, 'Language is required');
 
   const wordsWithProgress = await WordProgressService.findWordsToRepeat(user.id, lang, user.learningMode);
-  const totalWords = wordsWithProgress.length;
   wordsWithProgress.sort(() => Math.random() - 0.5);
 
   return {
     language: getLanguageLabel(lang),
-    totalWords,
     words: wordsWithProgress,
     user,
   };
 }
 
 export default function StudyingTopic() {
-  const { words, totalWords, language, user } = useLoaderData<typeof loader>();
+  const { words, language, user } = useLoaderData<typeof loader>();
 
-  const [currentWord, setCurrentWord] = useState<Word>(words[0]);
-  const [wordsArray, setWordsArray] = useState<Word[]>(words);
+  const [wordsState, setWordsState] = useState(words);
+  const [currentWord, setCurrentWord] = useState(words[0]);
+  const [wordsCount] = useState(words.length);
 
   function userAnswerHandler(correct: boolean) {
     if (correct) {
       currentWord.level++;
       // remove word from words array
-      wordsArray.splice(0, 1);
+      wordsState.splice(0, 1);
     } else {
       // decrease word level until it reaches 4
-      if (currentWord.level > 4) {
-        currentWord.level--;
-      }
+      currentWord.level = Math.max(currentWord.level, 4);
       // move word to 3 to 6 position
-      arrayMoveMutable(wordsArray, 0, Math.floor(Math.random() * 3) + 3);
+      arrayMoveMutable(wordsState, 0, Math.floor(Math.random() * 3) + 3);
     }
 
-    axios.post(`/progress/word/${currentWord.id}`, {
-      correct,
-      level: currentWord.level,
-      isReversed: currentWord.isReversed,
-    });
+    StudyingService.saveWordProgress({ ...currentWord, correct });
 
     // save new order
-    setWordsArray(wordsArray);
+    setWordsState(wordsState);
     // set new word
-    setCurrentWord(wordsArray[0]);
+    setCurrentWord(wordsState[0]);
   }
 
-  const progress = 1 - wordsArray.length / totalWords;
-  const completed = wordsArray.length < 3;
+  const progress = 1 - wordsState.length / wordsCount;
+  const completed = wordsState.length < 3;
 
   return (
     <Box>

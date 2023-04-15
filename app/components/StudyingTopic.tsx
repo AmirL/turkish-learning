@@ -16,47 +16,40 @@ type Word = SerializeFrom<WordWithProgress>;
 type StudyingProps = {
   topic: SerializeFrom<Topic>;
   words: Word[];
-  totalWords: Word[];
 };
 
-export function StudyingTopic({ topic, words, totalWords }: StudyingProps) {
-  const [currentWord, setCurrentWord] = useState<Word>(words[0]);
-  const [wordsArray, setWordsArray] = useState<Word[]>(words);
+export function StudyingTopic({ topic, words }: StudyingProps) {
+  const [wordsState, setWordsState] = useState(words.filter((word) => word.level < 5));
+  const [currentWord, setCurrentWord] = useState(wordsState[0]);
 
   const { user } = useContext(AppContext);
 
   function userAnswerHandler(correct: boolean) {
-    if (correct && wordsArray.length < 3 && topic) {
+    if (correct && wordsState.length < 3 && topic) {
       StudyingService.markTopicAsCompleted(topic.id);
     }
 
     StudyingService.updateWordLevel(correct, currentWord);
     StudyingService.saveWordProgress({ ...currentWord, correct });
 
-    StudyingService.moveCurrentWord(correct, currentWord.level, wordsArray);
+    StudyingService.moveCurrentWord(correct, currentWord.level, wordsState);
 
     // save new order
-    setWordsArray(wordsArray);
+    setWordsState(wordsState);
     // set new word
-    setCurrentWord(wordsArray[0]);
+    setCurrentWord(wordsState[0]);
   }
 
   // summ of all levels
-  let totalLevel = words.reduce((acc, word) => acc + word.level, 0);
-
-  // add to total level 5 points for each finished word
-  const finishedWords = totalWords.length - wordsArray.length;
-  totalLevel += finishedWords * 5;
-
-  const progress = totalLevel / (totalWords.length * 5);
-  const completed = wordsArray.length < 3;
+  const progress = StudyingService.getProgress(words);
+  const completed = wordsState.length < 3;
 
   return (
     <>
       {completed ? (
         <>
           <Completed />
-          <ListCompleted words={totalWords} />
+          <ListCompleted words={words} />
         </>
       ) : (
         <>

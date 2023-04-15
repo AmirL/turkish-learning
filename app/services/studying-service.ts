@@ -1,11 +1,5 @@
 import axios from 'axios';
-
-import type { SerializeFrom } from '@remix-run/node';
-
 import { arrayMoveMutable } from '~/utils/helpers';
-import type { WordWithProgress } from '~/services/word-progress.service.server';
-
-type Word = SerializeFrom<WordWithProgress>;
 
 interface ISaveWordProgress {
   id: number;
@@ -15,6 +9,18 @@ interface ISaveWordProgress {
 }
 
 export class StudyingService {
+  // get progress of studying based on words array and their levels
+  static getProgress(words: { level: number }[]): number {
+    if (words.length === 0) {
+      return 1;
+    }
+    // max achievable level for studying these words
+    const maxLevel = words.length * 5;
+    // summ actual achieved levels for all words
+    const actualLevel = words.reduce((acc, word) => acc + min(word.level, 5), 0);
+    return actualLevel / maxLevel;
+  }
+
   static moveCurrentWord(correct: boolean, currentWordLevel: number, wordsArray: any[]) {
     if (correct) {
       if (currentWordLevel >= 5) {
@@ -66,4 +72,8 @@ export class StudyingService {
         console.log('Topic mark as completed');
       });
   }
+}
+
+function min(a: number, b: number) {
+  return a < b ? a : b;
 }
