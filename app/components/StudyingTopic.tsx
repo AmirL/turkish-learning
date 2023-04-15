@@ -30,10 +30,10 @@ export function StudyingTopic({ topic, words, totalWords }: StudyingProps) {
       StudyingService.markTopicAsCompleted(topic.id);
     }
 
-    StudyingService.updateCurrentWord(correct, currentWord);
+    StudyingService.updateWordLevel(correct, currentWord);
     StudyingService.saveWordProgress({ ...currentWord, correct });
 
-    StudyingService.updateWordsArray(correct, currentWord.level, wordsArray);
+    StudyingService.moveCurrentWord(correct, currentWord.level, wordsArray);
 
     // save new order
     setWordsArray(wordsArray);

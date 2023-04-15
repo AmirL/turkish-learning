@@ -15,7 +15,7 @@ interface ISaveWordProgress {
 }
 
 export class StudyingService {
-  static updateWordsArray(correct: boolean, currentWordLevel: number, wordsArray: any[]) {
+  static moveCurrentWord(correct: boolean, currentWordLevel: number, wordsArray: any[]) {
     if (correct) {
       if (currentWordLevel >= 5) {
         // remove word from words array
@@ -31,8 +31,8 @@ export class StudyingService {
     }
   }
 
-  static updateCurrentWord(correct: boolean, currentWord: Word) {
-    if (correct) {
+  static updateWordLevel(answerCorrected: boolean, currentWord: { level: number; wrong: number }) {
+    if (answerCorrected) {
       if (currentWord.wrong === 0 && currentWord.level === 0) {
         // increase word level to 4 if user knows word from the first time
         currentWord.level = 4;
