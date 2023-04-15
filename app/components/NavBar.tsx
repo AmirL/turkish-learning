@@ -1,5 +1,5 @@
 import { Badge, BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
-import { Link, useLocation } from '@remix-run/react';
+import { Link } from '@remix-run/react';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
@@ -7,8 +7,6 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import LoopIcon from '@mui/icons-material/Loop';
-import { useContext } from 'react';
-import { AppContext } from './AppContext';
 
 type NavBarItem = {
   label: string;
@@ -16,13 +14,14 @@ type NavBarItem = {
   link: string;
 };
 
-export default function NavBar() {
-  const location = useLocation();
+export type NavBarProps = {
+  isAdmin: boolean;
+  repeatCount: number;
+  // can be one of [/, /repeat, /charts, /profile, /admin/import]
+  pathname: string;
+} & Record<string, unknown>;
 
-  const appContext = useContext(AppContext);
-  const repeatCount = appContext.repeatCount ?? 0;
-  const user = appContext.user;
-
+export default function NavBar({ isAdmin, repeatCount, pathname = '/', ...rest }: NavBarProps) {
   const navBar: NavBarItem[] = [
     { label: 'Home', icon: <HomeIcon />, link: '/' },
     // show repeat count on the icon badge
@@ -41,7 +40,7 @@ export default function NavBar() {
   ];
 
   // remove import tab for non editors
-  if (user.isAdmin) {
+  if (isAdmin) {
     // add admin tab for admins only
     navBar.push({ label: 'Admin', icon: <AdminPanelSettingsIcon />, link: '/admin/import' });
   }
@@ -50,8 +49,9 @@ export default function NavBar() {
     <Paper
       sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: 80, backgroundColor: '#E8EDF1' }}
       elevation={3}
+      {...rest}
     >
-      <BottomNavigation value={location.pathname} sx={{ backgroundColor: '#E8EDF1' }}>
+      <BottomNavigation value={pathname} sx={{ backgroundColor: '#E8EDF1' }}>
         {navBar.map((item) => (
           <BottomNavigationAction
             component={Link}

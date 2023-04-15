@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData, useMatches } from '@remix-run/react';
+import { Outlet, useLoaderData, useLocation, useMatches } from '@remix-run/react';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import { CircularProgress, Stack } from '@mui/material';
@@ -36,6 +36,7 @@ const TopBarStyled = styled(Box)({
 });
 
 export default function AppLayout() {
+  const location = useLocation();
   const { user, repeatCount } = useLoaderData<typeof loader>();
 
   const matches = useMatches();
@@ -77,7 +78,7 @@ export default function AppLayout() {
         <Box sx={{ mb: 15, mt: 14 }}>
           <Outlet />
         </Box>
-        <NavBar />
+        <NavBar isAdmin={user.isAdmin} repeatCount={repeatBadge} pathname={location.pathname} />
       </Container>
     </AppContext.Provider>
   );

@@ -3,9 +3,19 @@ import type { WordWithProgress } from '~/services/word-progress.service.server';
 import type { SerializeFrom } from '@remix-run/node';
 
 type IProps = {
+  /**
+   * List of completed words with fields:
+   * - word
+   * - translation
+   * - level
+   * - nextReview
+   */
   words?: SerializeFrom<WordWithProgress>[];
 };
 
+/**
+ * List of completed words for a topic
+ */
 export function ListCompleted({ words }: IProps) {
   return (
     <TableContainer component={Paper} sx={{ mt: 4 }}>
@@ -46,7 +56,7 @@ function NextReviewFormatted({ nextReview }: { nextReview: string | null }) {
     const timeDiff = reviewDate.getTime() - today.getTime();
     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    return daysDiff < 0 ? 'Today' : `in ${daysDiff} days`;
+    return daysDiff <= 0 ? 'Today' : `in ${daysDiff} days`;
   };
 
   return <>{getDaysLeft()}</>;
