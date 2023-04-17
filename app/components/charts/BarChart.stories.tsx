@@ -14,6 +14,9 @@ import {
   Legend,
   TimeScale,
 } from 'chart.js';
+import { faker } from '@faker-js/faker';
+
+faker.seed(0);
 
 const meta: Meta<typeof BarChart> = {
   component: BarChart,

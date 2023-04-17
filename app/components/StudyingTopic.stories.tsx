@@ -3,6 +3,9 @@ import { StudyingTopic } from './StudyingTopic';
 import { fakeMultiple, fakeTopic, fakeUser, fakeWordProgress, fakeWordWithTopic } from '../../prisma/types/fake-data';
 import { AppContext } from './AppContext';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { faker } from '@faker-js/faker';
+
+faker.seed(0);
 
 const appContext = {
   repeatCount: 0,

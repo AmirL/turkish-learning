@@ -3,6 +3,7 @@ import { ListLearnedWords } from './ListLearnedWords';
 import { fakeMultiple, fakeTopic, fakeWordWithTopic } from '../../../prisma/types/fake-data';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { faker } from '@faker-js/faker';
 
 const meta: Meta<typeof ListLearnedWords> = {
   component: ListLearnedWords,
@@ -20,6 +21,8 @@ const meta: Meta<typeof ListLearnedWords> = {
     },
   },
 };
+
+faker.seed(0);
 
 type Story = StoryObj<typeof ListLearnedWords>;
 

@@ -30,10 +30,16 @@ jobs:
           name: test-results
           path: test-results.xml
 
+      - name: Push changes to chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          # exit if there is any not accepted changes
+          exitZeroOnChanges: false
+
       - uses: amondnet/vercel-action@v20 #deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
           vercel-args: '--prod' #Optional
           vercel-org-id: ${{ secrets.ORG_ID}} #Required
           vercel-project-id: ${{ secrets.PROJECT_ID}} #Required
-          #working-directory: ./sub-directory
