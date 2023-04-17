@@ -73,7 +73,7 @@ export default function UserProfile() {
     <>
       <Container sx={{ mt: 5 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-          <UserAvatar user={data.user} sx={{ width: avatarSize, height: avatarSize, mb: 2 }} />
+          <UserAvatar avatar={data.user.avatar} sx={{ width: avatarSize, height: avatarSize, mb: 2 }} />
           <Form method="post">
             <Button variant="contained" type="submit" color="primary" disabled={loading} value="avatar" name="action">
               Generate new avatar

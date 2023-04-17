@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import type { NavBarProps } from './NavBar';
 import NavBar from './NavBar';
 import { BrowserRouter as Router } from 'react-router-dom';
 

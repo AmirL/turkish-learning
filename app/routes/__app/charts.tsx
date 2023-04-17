@@ -24,11 +24,17 @@ import type { StudySession, Topic, Word, WordProgress } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
 import { Box } from '@mui/system';
 import { Grid } from '@mui/material';
-import KnownWordsChart from '~/components/charts/KnownWordsChart';
-import RepeatRememberChart from '~/components/charts/RepeatRememberChart';
+import {
+  BarChart,
+  barChartLabels,
+  knownData,
+  rememberData,
+  repeatData,
+  wellKnownData,
+} from '~/components/charts/BarChart';
 
 import { StudySessionService } from '~/services/study-session.service.server';
-import type { TotalWordsCount} from '~/services/word-progress.service.server';
+import type { TotalWordsCount } from '~/services/word-progress.service.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
@@ -96,8 +102,16 @@ export default function ProgressCharts() {
             return (
               <div key={session.language}>
                 <h2>{getLanguageLabel(session.language)}</h2>
-                <RepeatRememberChart sessions={session.sessions} />
-                <KnownWordsChart sessions={session.sessions} />
+                <BarChart
+                  labels={barChartLabels(session.sessions)}
+                  data={session.sessions}
+                  datasets={[repeatData, rememberData]}
+                />
+                <BarChart
+                  labels={barChartLabels(session.sessions)}
+                  data={session.sessions}
+                  datasets={[wellKnownData, knownData]}
+                />
                 <Grid container spacing={2} gridTemplateColumns="repeat(2, 1fr)">
                   <Grid item xs={6}>
                     <Box sx={{ backgroundColor: '#C3DCBA', padding: '1rem', borderRadius: '0.5rem', mt: 3 }}>

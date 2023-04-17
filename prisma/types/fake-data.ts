@@ -1,18 +1,26 @@
-import type { Prisma, Topic, Word, WordProgress } from '@prisma/client';
+import type { Prisma, Topic, User, Word, WordProgress } from '@prisma/client';
 import { faker } from '@faker-js/faker';
-import { WordWithTopic } from '~/services/word-progress.service.server';
+import type { WordWithTopic } from '~/services/word-progress.service.server';
 
 export function fakeMultiple(n: number, fn: (overrides?: any) => any, overrides?: any) {
   return Array.from({ length: n }, () => fn(overrides));
 }
 
-export function fakeUser(overrides?: Partial<Omit<Prisma.UserUncheckedCreateInput, ''>>) {
+let fakeUserId = 0;
+export function fakeUser(overrides?: Partial<User>): User {
   return {
+    id: ++fakeUserId,
+    isEditor: false,
+    isAdmin: false,
+    muteSpeach: false,
+    nativeLanguage: faker.address.countryCode(),
+    learningMode: 0,
     email: faker.internet.email(),
     password: faker.lorem.words(5),
     name: faker.name.fullName(),
     avatar: faker.lorem.words(5),
-    updatedAt: faker.datatype.datetime(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.recent(),
     ...overrides,
   };
 }

@@ -72,7 +72,7 @@ export default function StudyingTopic() {
       ) : (
         <>
           <LinearProgress variant="determinate" value={progress * 100} />
-          <WordCard word={currentWord} userAnswerHandler={userAnswerHandler} user={user} />
+          <WordCard word={currentWord} userAnswerHandler={userAnswerHandler} isMuted={user.muteSpeach} />
         </>
       )}
     </Box>

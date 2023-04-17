@@ -9,7 +9,6 @@ import UserAvatar from '~/components/UserAvatar';
 import EditIcon from '@mui/icons-material/Edit';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
-
 const perPage = 10;
 
 export async function loader({ request }: LoaderArgs) {
@@ -93,7 +92,7 @@ export default function AdminUsers() {
                 </Link>
               </TableCell>
               <TableCell>
-                <UserAvatar user={user} />
+                <UserAvatar avatar={user.avatar} />
                 {user.name}
               </TableCell>
               <TableCell>{user.email}</TableCell>

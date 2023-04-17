@@ -1,15 +1,14 @@
 import { Avatar } from '@mui/material';
-import type { User } from '~/services/user.service.server';
 
 interface Props {
-  user: User;
+  avatar: string;
 }
 
-export default function UserAvatar({ user, ...rest }: Props & any) {
+export default function UserAvatar({ avatar, ...rest }: Props & any) {
   const width = rest?.sx?.width ?? 40;
   return (
     <Avatar {...rest}>
-      <img width={width} alt="User avatar" src={`data:image/svg+xml;utf8,${encodeURIComponent(user.avatar)}`} />
+      <img width={width} alt="User avatar" src={`data:image/svg+xml;utf8,${encodeURIComponent(avatar)}`} />
     </Avatar>
   );
 }

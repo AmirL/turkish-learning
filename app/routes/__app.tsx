@@ -71,7 +71,7 @@ export default function AppLayout() {
             {loading ? <CircularProgress /> : null}
             <Stack direction="row" spacing={2} alignItems="center">
               <h4>{user.name}</h4>
-              <UserAvatar user={user} />
+              <UserAvatar avatar={user.avatar} />
             </Stack>
           </Box>
         </TopBarStyled>

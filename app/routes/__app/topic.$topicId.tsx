@@ -52,7 +52,7 @@ export default function Topic() {
       <h3>
         {getLanguageLabel(topic.languageSource)} - {getLanguageLabel(topic.languageTarget)}
       </h3>
-      <StudyingTopic topic={topic} words={words} />
+      <StudyingTopic topic_id={topic.id} words={words} />
     </Box>
   );
 }

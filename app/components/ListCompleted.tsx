@@ -1,6 +1,4 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import type { WordWithProgress } from '~/services/word-progress.service.server';
-import type { SerializeFrom } from '@remix-run/node';
 
 type IProps = {
   /**
@@ -10,7 +8,12 @@ type IProps = {
    * - level
    * - nextReview
    */
-  words?: SerializeFrom<WordWithProgress>[];
+  words?: {
+    word: string;
+    translation: string;
+    level: number;
+    nextReview: string | null;
+  }[];
 };
 
 /**

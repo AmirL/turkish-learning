@@ -91,7 +91,7 @@ export default function EditUser() {
         <Form method="post">
           <Grid container spacing={2}>
             <Grid item xs={12} justifyContent="center" display="flex">
-              <UserAvatar user={userData} sx={{ width: 100, height: 100 }} />
+              <UserAvatar avatar={userData.avatar} sx={{ width: 100, height: 100 }} />
             </Grid>
             <Grid item xs={12}>
               {data?.success ? <Alert severity="success">User updated successfully</Alert> : null}
