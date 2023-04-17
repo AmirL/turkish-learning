@@ -18,6 +18,11 @@ import {
 const meta: Meta<typeof BarChart> = {
   component: BarChart,
   tags: ['autodocs'],
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile2',
+    },
+  },
 };
 
 type Story = StoryObj<typeof BarChart>;

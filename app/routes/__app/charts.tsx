@@ -19,10 +19,9 @@ import {
 } from 'chart.js';
 
 import { useEffect, useState } from 'react';
-import { Link, useLoaderData } from '@remix-run/react';
-import type { StudySession, Topic, Word, WordProgress } from '@prisma/client';
+import { useLoaderData } from '@remix-run/react';
+import type { StudySession } from '@prisma/client';
 import { getLanguageLabel } from '~/utils/strings';
-import { Box } from '@mui/system';
 import { Grid } from '@mui/material';
 import {
   BarChart,
@@ -34,8 +33,8 @@ import {
 } from '~/components/charts/BarChart';
 
 import { StudySessionService } from '~/services/study-session.service.server';
-import type { TotalWordsCount } from '~/services/word-progress.service.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
+import { ListLearnedWords } from '~/components/charts/ListLearnedWords';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -114,26 +113,22 @@ export default function ProgressCharts() {
                 />
                 <Grid container spacing={2} gridTemplateColumns="repeat(2, 1fr)">
                   <Grid item xs={6}>
-                    <Box sx={{ backgroundColor: '#C3DCBA', padding: '1rem', borderRadius: '0.5rem', mt: 3 }}>
-                      <h3>Learned words - {getTotalByLanguage(data.totalKnownWords, session.language)}</h3>
-                      {getWordsByLanguage(data.lastKnownWords, session.language).map((word) => {
-                        return <div key={word.word.id}>{word.word.word}</div>;
-                      })}
-                      <Box sx={{ mt: 1 }}>
-                        <Link to={`/words?language=${session.language}`}>Show all</Link>
-                      </Box>
-                    </Box>
+                    <ListLearnedWords
+                      total={data.totalKnownWords}
+                      lastLearnedWords={data.lastKnownWords}
+                      language={session.language}
+                      title="Learned words"
+                      backgroundColor="#C3DCBA"
+                    />
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ backgroundColor: '#A5C0B3', padding: '1rem', borderRadius: '0.5rem', mt: 3 }}>
-                      <h3>Well known words - {getTotalByLanguage(data.totalWellKnownWords, session.language)}</h3>
-                      {getWordsByLanguage(data.lastWellKnownWords, session.language).map((word) => {
-                        return <div key={word.word.id}>{word.word.word}</div>;
-                      })}
-                      <Box sx={{ mt: 1 }}>
-                        <Link to={`/words?language=${session.language}`}>Show all</Link>
-                      </Box>
-                    </Box>
+                    <ListLearnedWords
+                      total={data.totalWellKnownWords}
+                      lastLearnedWords={data.lastWellKnownWords}
+                      language={session.language}
+                      title="Well known words"
+                      backgroundColor="#A5C0B3"
+                    />
                   </Grid>
                 </Grid>
               </div>
@@ -142,23 +137,4 @@ export default function ProgressCharts() {
         : null}
     </div>
   );
-}
-
-const getTotalByLanguage = (words: SerializeFrom<TotalWordsCount[]>, language: string) => {
-  // get first values with language
-  const first = words.find((word) => word.language === language);
-  return first?.count || 0;
-};
-
-type KnowWords = SerializeFrom<
-  WordProgress & {
-    word: Word & {
-      topic: Topic;
-    };
-  }
->;
-
-function getWordsByLanguage(words: KnowWords[], language: string, limit = 10) {
-  const result = words.filter((word) => word.word.topic.languageSource === language);
-  return result.slice(0, limit);
 }
