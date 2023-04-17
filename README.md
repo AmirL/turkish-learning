@@ -3,11 +3,13 @@
 A mobile-first Progressive Web Application. This flashcard app was created entirely by me and showcases my skills in modern frameworks.
 
 - [Deployed on Vercel](https://turkish-learning.vercel.app/)
+- [Published Storybook](https://643d340ca88ed05c30991078-xpsatreydw.chromatic.com/?path=/docs/components-navbar--docs)
 
 ## Tech Stack
 
 - Backend: Node.js, [Remix](https://remix.run/), (Serverless)
 - Frontend: [React](https://react.dev/), [MUI](https://mui.com/)
+- [Storybook](https://storybook.js.org/) + VisualTests with [Chromatic](https://www.chromatic.com/)
 - ORM: [Prisma](https://www.prisma.io/)
 - Tests: [Vitest](https://vitest.dev/)
 - DB: [Planetscale](https://planetscale.com/), MySql
