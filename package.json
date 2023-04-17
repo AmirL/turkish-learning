@@ -9,7 +9,8 @@
     "test:ui": "vitest --coverage --ui",
     "typecheck": "tsc",
     "seed": "ts-node prisma/seed.ts",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "cross-env NODE_ENV=.env npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.5",
@@ -57,6 +58,8 @@
     "@vitest/coverage-c8": "^0.29.8",
     "@vitest/coverage-istanbul": "^0.29.8",
     "@vitest/ui": "^0.29.8",
+    "chromatic": "^6.17.3",
+    "cross-env": "^7.0.3",
     "eslint": "^8.27.0",
     "eslint-plugin-storybook": "^0.6.11",
     "faker": "^6.6.6",
