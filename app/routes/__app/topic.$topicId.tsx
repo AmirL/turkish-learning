@@ -9,7 +9,7 @@ import { Box } from '@mui/material';
 import { WordProgressService } from '~/services/word-progress.service.server';
 import { sortRandom } from '~/utils/arrays';
 import { WordService } from '~/services/word.service.server';
-import { StudyingTopic } from '~/components/StudyingTopic';
+import { StudyingTopic } from '~/components/studying/StudyingTopic';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {

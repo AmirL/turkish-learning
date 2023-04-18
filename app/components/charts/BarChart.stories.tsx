@@ -25,6 +25,7 @@ const meta: Meta<typeof BarChart> = {
     viewport: {
       defaultViewport: 'mobile2',
     },
+    chromatic: { delay: 400 },
   },
 };
 

@@ -1,7 +1,7 @@
 import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { styled } from '@mui/system';
-import { SpeakText } from './SpeakText';
+import { SpeakText } from '../SpeakText';
 
 export type Word = {
   word: string;

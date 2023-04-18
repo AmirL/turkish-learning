@@ -1,14 +1,14 @@
 import { LinearProgress } from '@mui/material';
-import { WordCard } from '~/components/WordCard';
+import { WordCard } from '~/components/studying/WordCard';
 import { useContext, useState } from 'react';
-import { Completed } from '~/components/Completed';
-import { ListCompleted } from '~/components/ListCompleted';
-import { AppContext } from './AppContext';
+import { Completed } from '~/components/studying/Completed';
+import { AppContext } from '../AppContext';
 
 import { StudyingService } from '~/services/studying-service';
-import { MuteButton } from './MuteButton';
+import { MuteButton } from '../MuteButton';
 import type { WordWithProgress } from '~/services/word-progress.service.server';
 import type { SerializeFrom } from '@remix-run/node';
+import { ListCompleted } from './ListCompleted';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 type StudyingProps = {

@@ -1,11 +1,11 @@
 // @file edit user form by admin
 
-import { Alert, Box, Button, DialogContent, DialogTitle, Grid, TextField } from '@mui/material';
+import { Alert, Button, Grid, TextField } from '@mui/material';
 import { json } from '@remix-run/node';
-import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
+import { Form, useActionData, useLoaderData } from '@remix-run/react';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
 import invariant from 'ts-invariant';
-import CloseDialogButton from '~/components/CloseDialogButton';
+import { AdminEditDialog } from '~/components/AdminEditDialog';
 import UserAvatar from '~/components/UserAvatar';
 import { UserService } from '~/services/user.service.server';
 
@@ -86,8 +86,7 @@ export default function EditUser() {
 
   return (
     <>
-      <DialogTitle>Edit User {userData.name}</DialogTitle>
-      <DialogContent sx={{ textAlign: 'center' }}>
+      <AdminEditDialog title={`Edit user ${userData.name}`} link="/admin/users">
         <Form method="post">
           <Grid container spacing={2}>
             <Grid item xs={12} justifyContent="center" display="flex">
@@ -116,10 +115,7 @@ export default function EditUser() {
             </Grid>
           </Grid>
         </Form>
-        <Link to="/admin/users">
-          <CloseDialogButton />
-        </Link>
-      </DialogContent>
+      </AdminEditDialog>
     </>
   );
 }

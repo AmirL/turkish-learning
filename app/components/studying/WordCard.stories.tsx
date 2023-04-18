@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { WordCard } from './WordCard';
+import { WordCard } from '../studying/WordCard';
 
 const meta: Meta<typeof WordCard> = {
   component: WordCard,

@@ -3,9 +3,10 @@ import { redirect } from '@remix-run/node';
 import { authenticator, login } from '~/utils/auth.server';
 import { json } from '@remix-run/node';
 import { Form, Link, useActionData, useTransition } from '@remix-run/react';
-import { Button, Grid, TextField, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
 import { UserService } from '~/services/user.service.server';
+import { LoginForm } from '~/components/auth/LoginForm';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -61,49 +62,10 @@ export default function Login() {
   const actionData = useActionData<typeof action>();
   const transtion = useTransition();
 
-  const submitText = transtion.state === 'idle' ? 'Login' : 'Logging in...';
-
   return (
     <>
       <Form method="post">
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12}>
-            {actionData?.formError ? (
-              <Typography color="error" sx={{ textAlign: 'left' }}>
-                {actionData.formError}
-              </Typography>
-            ) : null}
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="email"
-              variant="outlined"
-              label="Email"
-              name="email"
-              required
-              fullWidth
-              autoComplete="email"
-              defaultValue={actionData?.fields?.email}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="password"
-              variant="outlined"
-              label="Password"
-              name="password"
-              type={'password'}
-              required
-              fullWidth
-              autoComplete="current-password"
-            />
-          </Grid>
-          <Grid item xs={12} justifyContent="center" display="flex">
-            <Button type="submit" variant="contained" color="primary" disabled={transtion.state !== 'idle'}>
-              {submitText}
-            </Button>
-          </Grid>
-        </Grid>
+        <LoginForm actionData={actionData} transtionState={transtion.state} />
       </Form>
       <Typography sx={{ mt: 2 }}>
         Don't have an account?{' '}

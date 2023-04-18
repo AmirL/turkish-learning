@@ -1,11 +1,11 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
 import { Form, Link, useSearchParams, useActionData, useTransition } from '@remix-run/react';
-import { Button, Grid, TextField, Typography } from '@mui/material';
 import { badRequest } from '~/utils/request.server';
 import { login } from '~/utils/auth.server';
 import { UserService } from '~/services/user.service.server';
 import { AvatarService } from '~/services/avatar.service.server';
+import { SignupForm } from '~/components/auth/SignupForm';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -68,85 +68,13 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Signup() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') ?? undefined;
-  const data = useActionData<typeof action>();
+  const actionData = useActionData<typeof action>();
   const transition = useTransition();
-
-  const submitText = transition.state !== 'idle' ? 'Signing up...' : 'Sign Up';
 
   return (
     <>
       <Form method="post">
-        {/* Grid to style signup form */}
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            {data?.formError ? (
-              <Typography color="error" sx={{ textAlign: 'left' }}>
-                {data.formError}
-              </Typography>
-            ) : null}
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="name"
-              variant="outlined"
-              label="Student name"
-              name="name"
-              required
-              fullWidth
-              autoComplete="name"
-              defaultValue={data?.fields?.name}
-              error={!!data?.fieldErrors?.name}
-              helperText={data?.fieldErrors?.name}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="email"
-              variant="outlined"
-              label="Email"
-              name="email"
-              required
-              fullWidth
-              autoComplete="email"
-              defaultValue={data?.fields?.email}
-              error={!!data?.fieldErrors?.email}
-              helperText={data?.fieldErrors?.email}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="password"
-              variant="outlined"
-              label="Password"
-              name="password"
-              type={'password'}
-              required
-              fullWidth
-              autoComplete="current-password"
-              error={!!data?.fieldErrors?.password}
-              helperText={data?.fieldErrors?.password}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="confirmPassword"
-              variant="outlined"
-              label="Confirm Password"
-              name="confirmPassword"
-              type={'password'}
-              required
-              fullWidth
-              autoComplete="current-password"
-              error={!!data?.fieldErrors?.confirmPassword}
-              helperText={data?.fieldErrors?.confirmPassword}
-            />
-          </Grid>
-          <Grid item xs={12} justifyContent="center" display="flex">
-            <Button type="submit" variant="contained" disabled={transition.state !== 'idle'}>
-              {submitText}
-            </Button>
-          </Grid>
-        </Grid>
+        <SignupForm actionData={actionData} transtionState={transition.state} />
         <input type="hidden" name="redirectTo" defaultValue={redirectTo} />
       </Form>
       <p>

@@ -4,10 +4,10 @@ import invariant from 'ts-invariant';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
 import { Box, LinearProgress } from '@mui/material';
-import { WordCard } from '~/components/WordCard';
+import { WordCard } from '~/components/studying/WordCard';
 import { useState } from 'react';
 import { arrayMoveMutable } from '~/utils/helpers';
-import { Completed } from '~/components/Completed';
+import { Completed } from '~/components/studying/Completed';
 import { WordProgressService } from '~/services/word-progress.service.server';
 import { StudyingService } from '~/services/studying-service';
 

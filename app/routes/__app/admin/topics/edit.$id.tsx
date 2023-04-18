@@ -1,20 +1,9 @@
-import {
-  Alert,
-  Box,
-  Button,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from '@mui/material';
+import { Alert, Button, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { json, redirect } from '@remix-run/node';
-import { Form, Link, useActionData, useLoaderData } from '@remix-run/react';
+import { Form, useActionData, useLoaderData } from '@remix-run/react';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/router';
 import invariant from 'ts-invariant';
-import CloseDialogButton from '~/components/CloseDialogButton';
+import { AdminEditDialog } from '~/components/AdminEditDialog';
 
 import { requireUser } from '~/utils/auth.server';
 import { db } from '~/utils/db.server';
@@ -90,8 +79,7 @@ export default function EditUser() {
 
   return (
     <>
-      <DialogTitle>Edit Topic {topic.name}</DialogTitle>
-      <DialogContent sx={{ textAlign: 'center' }}>
+      <AdminEditDialog title={`Edit Topic ${topic.name}`} link="/admin/topics">
         <Form method="post">
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -131,10 +119,7 @@ export default function EditUser() {
             </Grid>
           </Grid>
         </Form>
-        <Link to="/admin/topics">
-          <CloseDialogButton />
-        </Link>
-      </DialogContent>
+      </AdminEditDialog>
     </>
   );
 }
