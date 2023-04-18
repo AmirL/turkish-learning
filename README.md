@@ -3,7 +3,7 @@
 A mobile-first Progressive Web Application. This flashcard app was created entirely by me and showcases my skills in modern frameworks.
 
 - [Deployed on Vercel](https://turkish-learning.vercel.app/)
-- [Published Storybook](https://643d340ca88ed05c30991078-xpsatreydw.chromatic.com/?path=/docs/components-navbar--docs)
+- [Published Storybook](https://main--643d340ca88ed05c30991078.chromatic.com/)
 
 ## Tech Stack
 

@@ -10,7 +10,7 @@
     "typecheck": "tsc",
     "seed": "ts-node prisma/seed.ts",
     "build-storybook": "storybook build",
-    "chromatic": "cross-env NODE_ENV=.env npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
+    "chromatic": "cross-env NODE_ENV=.env npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN --force-rebuild"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.5",
