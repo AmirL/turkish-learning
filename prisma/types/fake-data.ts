@@ -1,8 +1,9 @@
 import type { Prisma, Topic, User, Word, WordProgress } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import type { WordWithTopic } from '~/services/word-progress.service.server';
+import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
 
-export function fakeMultiple(n: number, fn: (overrides?: any) => any, overrides?: any) {
+export function fakeMultiple<T>(n: number, fn: (overrides?: any) => T, overrides?: any): T[] {
   return Array.from({ length: n }, () => fn(overrides));
 }
 
@@ -55,12 +56,14 @@ export function fakeWordWithTopic({ topic, word }: WordTopicParams = {}): WordWi
 
 let fakeWordProgressId = 0;
 export function fakeWordProgress(overrides?: Partial<Omit<WordProgress, 'views'>>): WordProgress {
-  const correct = overrides?.correct ?? 0;
-  const wrong = overrides?.wrong ?? 0;
+  const correct = overrides?.correct ?? faker.datatype.number({ min: 1, max: 4 });
+  const wrong = overrides?.wrong ?? faker.datatype.number({ min: 1, max: 4 });
   const views = correct + wrong;
-  const level = overrides?.level ?? 0;
+  const level = overrides?.level ?? faker.datatype.number({ min: 1, max: 5 });
   const known = level >= 5 ? faker.date.past() : null;
   const wellKnown = level >= 8 ? faker.date.past() : null;
+  const isReversed = overrides?.isReversed ?? faker.datatype.boolean();
+
   return {
     id: ++fakeWordProgressId,
     user_id: faker.datatype.number(),
@@ -69,7 +72,7 @@ export function fakeWordProgress(overrides?: Partial<Omit<WordProgress, 'views'>
     wrong,
     correct,
     views,
-    isReversed: false,
+    isReversed,
     nextReview: null,
     known,
     wellKnown,
@@ -77,6 +80,36 @@ export function fakeWordProgress(overrides?: Partial<Omit<WordProgress, 'views'>
     updatedAt: faker.date.recent(),
     ...overrides,
   };
+}
+
+export function fakeWordProgressForWords(
+  topicWords: Word[],
+  topic: Topic,
+  overrides?: Partial<Omit<WordProgress, 'views'>>
+) {
+  type ResultType = WordProgress & {
+    word: Word & {
+      topic: Topic;
+    };
+  };
+  // type ResultType = WordProgress & {
+  //   word: Word;
+  // };
+  let wordsProgress: ResultType[] = [];
+  topicWords.forEach((word) => {
+    const wordProgress = fakeWordProgress({
+      word_id: word.id,
+      ...overrides,
+    });
+    wordsProgress.push({
+      ...wordProgress,
+      word: {
+        ...word,
+        topic,
+      },
+    });
+  });
+  return wordsProgress;
 }
 
 let fakeTopicId = 0;

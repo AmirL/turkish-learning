@@ -8,8 +8,8 @@ import { getLanguageLabel } from '~/utils/strings';
 import { Box } from '@mui/material';
 import { WordProgressService } from '~/services/word-progress.service.server';
 import { sortRandom } from '~/utils/arrays';
-import { WordService } from '~/services/word.service.server';
 import { StudyingTopic } from '~/components/studying/StudyingTopic';
+import { WordRepository } from '~/services/database/word.repository.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -28,7 +28,7 @@ export async function loader({ request, params }: LoaderArgs) {
   });
   invariant(topic, 'Topic not found');
 
-  let topicWords = await WordService.getWordsByTopicId(topicId);
+  let topicWords = await WordRepository.getWordsByTopicId(topicId);
   invariant(topicWords.length > 0, 'No words in topic');
 
   let words = await WordProgressService.getWordsProgress(topicWords, user.id, user.learningMode);

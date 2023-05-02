@@ -35,6 +35,8 @@ import {
 import { StudySessionService } from '~/services/study-session.service.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
 import { ListLearnedWords } from '~/components/charts/ListLearnedWords';
+import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
+import { StudySessionRepository } from '~/services/database/study-session.repository.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -47,20 +49,31 @@ export async function loader({ request }: LoaderArgs) {
 
   const FilterDate = new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000);
   // load sessions grouped by language and date
-  const sessions = await StudySessionService.getUserSessions(user.id, FilterDate);
+  const sessions = await StudySessionRepository.getUserSessions(user.id, FilterDate);
 
   // reverse sessions to show them in chronological order
   sessions.reverse();
 
   // get languages from studySessions
-  const languages = await StudySessionService.getUserStudyingLanguages(user.id);
+  const languages = await StudySessionRepository.getUserStudyingLanguages(user.id);
 
   // get last known words for each language
-  const lastKnownWords = await WordProgressService.getUserLastKnownWords(user.id, 50);
-  const lastWellKnownWords = await WordProgressService.getUserLastWellKnownWords(user.id, 50);
+  const lastKnownWords = await WordProgressRepository.findByUser({
+    user_id: user.id,
+    known: true,
+    take: 50,
+    orderBy: { known: 'desc' },
+  });
 
-  const totalKnownWords = await WordProgressService.getUserTotalWords(user.id, 'known');
-  const totalWellKnownWords = await WordProgressService.getUserTotalWords(user.id, 'wellKnown');
+  const lastWellKnownWords = await WordProgressRepository.findByUser({
+    user_id: user.id,
+    wellKnown: true,
+    take: 50,
+    orderBy: { wellKnown: 'desc' },
+  });
+
+  const totalKnownWords = await WordProgressRepository.getUserTotalWords(user.id, 'known');
+  const totalWellKnownWords = await WordProgressRepository.getUserTotalWords(user.id, 'wellKnown');
 
   return json({ sessions, languages, lastKnownWords, lastWellKnownWords, totalKnownWords, totalWellKnownWords }, 200);
 }

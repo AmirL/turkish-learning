@@ -5,6 +5,7 @@ import type { LoaderArgs } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
 import { useContext, useEffect } from 'react';
 import { AppContext } from '~/components/AppContext';
+import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
@@ -17,7 +18,7 @@ export const handle = {
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
-  const repeatLanguages = await WordProgressService.languagesToRepeat(user);
+  const repeatLanguages = await WordProgressRepository.languagesToRepeat(user.id, user.learningMode);
 
   return {
     languages: repeatLanguages,

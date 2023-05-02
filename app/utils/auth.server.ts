@@ -5,6 +5,7 @@ import { redirect } from '@remix-run/router';
 import type { User } from '~/services/user.service.server';
 import { UserService } from '~/services/user.service.server';
 import invariant from 'ts-invariant';
+import { UserRepository } from '~/services/database/user.repository.server';
 
 // Create an instance of the authenticator, pass a Type, User,  with what
 // strategies will return and will store in the session
@@ -44,8 +45,7 @@ export async function getLoggedUser(request: Request) {
   }
 
   if (userFromCookies) {
-    //return await db.user.findUnique({ where: { id: userFromCookies.id } });
-    return await UserService.getUserById(userFromCookies.id);
+    return await UserRepository.findById(userFromCookies.id);
   }
 
   return null;
@@ -63,8 +63,7 @@ export async function requireUser(request: Request) {
   }
 
   // always check user in DB to get the latest data for access control
-  // const user = await db.user.findUnique({ where: { id: userFromCookies.id } });
-  const user = await UserService.getUserById(userFromCookies.id);
+  const user = await UserRepository.findById(userFromCookies.id);
 
   if (!user) {
     throw redirect('/login');

@@ -5,6 +5,7 @@ import invariant from 'ts-invariant';
 import { db } from '~/utils/db.server';
 import { StudySessionService } from '~/services/study-session.service.server';
 import { WordProgressService } from '~/services/word-progress.service.server';
+import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
 
 export const action: ActionFunction = async ({ request, params }) => {
   const user = await requireUser(request);
@@ -25,7 +26,15 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const language = word.topic?.languageSource ?? 'en';
 
-  await WordProgressService.updateWordProgress({ correct, level, user_id: user.id, word_id: word.id, isReversed });
+  const nextReview = WordProgressService.getNextReviewDate(level, correct);
+  await WordProgressRepository.writeUserProgress({
+    correct,
+    level,
+    user_id: user.id,
+    word_id: word.id,
+    isReversed,
+    nextReview,
+  });
 
   await StudySessionService.updateStudySession(user.id, language, correct);
 

@@ -11,6 +11,7 @@ import { Box } from '@mui/system';
 import { Button, Typography } from '@mui/material';
 import type { ImportWordRow } from '~/services/word.service.server';
 import { WordService } from '~/services/word.service.server';
+import { TopicService } from '~/services/topic.service.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 function IsRowType(row: any): row is ImportWordRow {
@@ -31,7 +32,8 @@ export const action: ActionFunction = async ({ request }) => {
   invariant(table.length > 0, 'Data is an empty array');
   invariant(table.every(IsRowType), 'Data is not an array of rows');
 
-  const result = await WordService.importWords(table);
+  const topicIds = await TopicService.importTopics(table);
+  const result = await WordService.importWords(table, topicIds);
   return json(result);
 };
 

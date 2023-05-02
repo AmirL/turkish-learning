@@ -1,5 +1,4 @@
-import { db } from '~/utils/db.server';
-import { TopicService } from './topic.service.server';
+import { WordRepository } from './database/word.repository.server';
 
 export type ImportWordRow = {
   word: string;
@@ -10,41 +9,15 @@ export type ImportWordRow = {
 };
 
 export class WordService {
-  static async getWordsByTopicId(topicId: number) {
-    return await db.word.findMany({
-      include: {
-        topic: true,
-      },
-      where: {
-        topic_id: Number(topicId),
-      },
-    });
-  }
-
-  static async createWords(words: { word: string; translation: string; topic_id: number }[]) {
-    return await db.word.createMany({
-      data: words,
-      skipDuplicates: true,
-    });
-  }
-
-  static async importWords(table: ImportWordRow[]) {
-    await TopicService.createTopics(table);
-
-    const uniqueTopicNames = [...new Set(table.map((topic) => topic.topic))];
-
-    const topicsIds = await TopicService.getTopicsIds(uniqueTopicNames);
-
+  static async importWords(table: ImportWordRow[], topicsIds: Record<string, number>) {
     // prepare words objetcs
-    const words = table.map((row) => {
-      return {
-        word: row.word,
-        translation: row.translation,
-        topic_id: topicsIds[`${row.topic}-${row.languageSource}-${row.languageTarget}`],
-      };
-    });
+    const words = table.map((row) => ({
+      word: row.word,
+      translation: row.translation,
+      topic_id: topicsIds[`${row.topic}-${row.languageSource}-${row.languageTarget}`],
+    }));
 
-    const result = await WordService.createWords(words);
+    const result = await WordRepository.createWords(words);
 
     const skipped = words.length - result.count;
 

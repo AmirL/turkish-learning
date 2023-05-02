@@ -1,9 +1,6 @@
-import { db } from '~/utils/db.server';
 import type { SerializeFrom } from '@remix-run/node';
-import type { Topic, User, Word } from '@prisma/client';
-import { Prisma } from '@prisma/client';
-
-export type WordStatus = 'known' | 'wellKnown';
+import type { Topic, Word } from '@prisma/client';
+import { WordProgressRepository } from './database/word-progress.repository.server';
 
 export type TotalWordsCount = {
   language: string;
@@ -27,110 +24,9 @@ export const LearningMode = {
   both: 2,
 };
 
-type LanguageData = {
-  language: string;
-  count: string;
-};
-
-type UpdateWordProgressParams = {
-  correct: boolean;
-  level: number;
-  user_id: number;
-  word_id: number;
-  isReversed: boolean;
-};
-
 export type WordWithTopic = Word & { topic: Topic };
 
 export class WordProgressService {
-  static async getUserLastWellKnownWords(user_id: number, count: number) {
-    return await db.wordProgress.findMany({
-      where: {
-        user_id: user_id,
-        wellKnown: {
-          not: null,
-        },
-      },
-      include: {
-        word: {
-          include: {
-            topic: true,
-          },
-        },
-      },
-      orderBy: {
-        wellKnown: 'desc',
-      },
-      take: count,
-    });
-  }
-
-  static async getUserLastKnownWords(user_id: number, count: number) {
-    return await db.wordProgress.findMany({
-      where: {
-        user_id: user_id,
-        // known is not null
-        known: {
-          not: null,
-        },
-      },
-      include: {
-        word: {
-          include: {
-            topic: true,
-          },
-        },
-      },
-      orderBy: {
-        known: 'desc',
-      },
-      take: count,
-    });
-  }
-
-  static async getUserTotalWords(user_id: number, status: WordStatus) {
-    let wordStatusFilter = Prisma.sql``;
-
-    switch (status) {
-      case 'known':
-        wordStatusFilter = Prisma.sql`AND wp.known IS NOT NULL`;
-        break;
-      case 'wellKnown':
-        wordStatusFilter = Prisma.sql`AND wp.wellKnown IS NOT NULL`;
-        break;
-    }
-
-    // grouped by languageSource
-    const res: TotalWordsCount[] = await db.$queryRaw`
-      SELECT
-        languageSource as language,
-        COUNT(*) as count
-      FROM
-      WordProgress wp
-      INNER JOIN Word w ON w.id = wp.word_id
-      INNER JOIN Topic t ON t.id = w.topic_id
-      WHERE
-        wp.user_id = ${user_id}
-        ${wordStatusFilter}
-      GROUP BY
-        languageSource`;
-
-    return res;
-  }
-
-  static async getWordsCountWithLevel(user_id: number, level: number, languageSource: string) {
-    type KnowWordsRes = { knownWords: string };
-
-    const knownWordsRes: KnowWordsRes[] = await db.$queryRaw`
-    SELECT COUNT(DISTINCT w.id) AS knownWords FROM WordProgress wp
-    INNER JOIN Word w ON wp.word_id = w.id
-    INNER JOIN Topic t ON w.topic_id = t.id
-    WHERE wp.user_id = ${user_id} AND wp.level >= ${level} AND t.languageSource = ${languageSource}
-  `;
-
-    return parseInt(knownWordsRes[0].knownWords, 10);
-  }
-
   /**
    * Get words with progress for user, depending on learning mode
    *
@@ -139,26 +35,11 @@ export class WordProgressService {
    * @param learningMode (normal, reverse, both)
    * @returns
    */
-  static async getWordsProgress(
-    words: WordWithTopic[],
-    user_id: number,
-    learningMode: number
-  ): Promise<WordWithProgress[]> {
-    const wordProgress = await db.wordProgress.findMany({
-      select: {
-        word_id: true,
-        level: true,
-        isReversed: true,
-        wrong: true,
-        nextReview: true,
-      },
-      where: {
-        user_id,
-        word_id: {
-          in: words.map((word) => word.id),
-        },
-      },
-    });
+  static async getWordsProgress(words: WordWithTopic[], user_id: number, learningMode: number) {
+    const wordProgress = await WordProgressRepository.findByUserAndWordsId(
+      user_id,
+      words.map((word) => word.id)
+    );
 
     // // create a map with wordId and isReversed as key and level as value
     const wordProgressMap = new Map();
@@ -221,7 +102,7 @@ export class WordProgressService {
     return withDirection;
   }
 
-  static async updateWordProgress({ correct, level, user_id, word_id, isReversed }: UpdateWordProgressParams) {
+  static getNextReviewDate(level: number, correct: boolean) {
     const day = 24 * 60 * 60 * 1000;
     // 1 day for level 5
     // 3 days for level 6
@@ -233,67 +114,11 @@ export class WordProgressService {
     const today = new Date(Date.now());
     today.setUTCHours(0, 0, 0, 0);
 
-    // get current nextReview date from db
-    const currentProgress = await db.wordProgress.findUnique({
-      where: { user_id_word_id_isReversed: { user_id, word_id, isReversed } },
-    });
-
-    // current nextReview date or null
-    let nextReviewDate = currentProgress?.nextReview || null;
     if (correct && level >= 5) {
-      // today plus nextReviewStep days
-      nextReviewDate = new Date(today.getTime() + nextReviewStep * day);
+      return new Date(today.getTime() + nextReviewStep * day);
     }
 
-    await db.wordProgress.upsert({
-      where: { user_id_word_id_isReversed: { user_id, word_id, isReversed } },
-      update: {
-        level,
-        correct: correct ? { increment: 1 } : undefined,
-        wrong: !correct ? { increment: 1 } : undefined,
-        views: { increment: 1 },
-        // keep nextReview date is not correct answer, and update if correct answer and level >= 5
-        nextReview: nextReviewDate,
-        known: (currentProgress?.known ?? null) === null && level >= 5 ? today : undefined,
-        wellKnown: (currentProgress?.wellKnown ?? null) === null && level >= 8 ? today : undefined,
-      },
-      create: {
-        level,
-        correct: correct ? 1 : 0,
-        views: 1,
-        wrong: !correct ? 1 : 0,
-        user: { connect: { id: user_id } },
-        word: { connect: { id: word_id } },
-        isReversed,
-        nextReview: nextReviewDate,
-      },
-    });
-  }
-
-  static async languagesToRepeat(user: User) {
-    let isReversed = Prisma.sql``;
-    switch (user.learningMode) {
-      case LearningMode.normal:
-        isReversed = Prisma.sql`AND isReversed = 0`;
-        break;
-      case LearningMode.reverse:
-        isReversed = Prisma.sql`AND isReversed = 1`;
-        break;
-    }
-
-    // get count of words for each language with nextReview less or equal to today
-    const languages: LanguageData[] = await db.$queryRaw`
-    SELECT t.languageSource as language, COUNT(*) as count FROM WordProgress wp
-    INNER JOIN Word w ON w.id = wp.word_id
-    INNER JOIN Topic t ON t.id = w.topic_id
-    WHERE
-    user_id = ${user.id}
-    AND nextReview <= CURRENT_DATE
-    ${isReversed}
-    GROUP BY t.languageSource
-    HAVING count > 5
-    `;
-    return languages;
+    return null;
   }
 
   static async findWordsToRepeat(user_id: number, lang: string, learningMode: number): Promise<WordWithProgress[]> {
@@ -311,27 +136,7 @@ export class WordProgressService {
         break;
     }
 
-    const words = await db.wordProgress.findMany({
-      where: {
-        user_id: user_id,
-        nextReview: {
-          lte: new Date(),
-        },
-        isReversed,
-        word: {
-          topic: {
-            languageSource: lang,
-          },
-        },
-      },
-      include: {
-        word: {
-          include: {
-            topic: true,
-          },
-        },
-      },
-    });
+    const words = await WordProgressRepository.findWordsToRepeat(user_id, lang, isReversed);
 
     return words.map((wordProgress) => ({
       id: wordProgress.word.id,
@@ -343,22 +148,5 @@ export class WordProgressService {
       wrong: wordProgress.wrong,
       nextReview: wordProgress.nextReview,
     }));
-  }
-
-  static async updateNextReviewByTopic(user_id: number, topic_id: number, nextReview: Date, level: number) {
-    await db.wordProgress.updateMany({
-      where: {
-        user_id,
-        word: {
-          topic_id,
-        },
-        level: {
-          lt: level,
-        },
-      },
-      data: {
-        nextReview,
-      },
-    });
   }
 }

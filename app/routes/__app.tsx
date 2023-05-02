@@ -11,12 +11,13 @@ import { styled } from '@mui/system';
 import { useState } from 'react';
 import { AppContext } from '~/components/AppContext';
 import { WordProgressService } from '~/services/word-progress.service.server';
+import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
-  const repeatLanguages = await WordProgressService.languagesToRepeat(user);
+  const repeatLanguages = await WordProgressRepository.languagesToRepeat(user.id, user.learningMode);
   // summ languages count
   const repeatCount = repeatLanguages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
 

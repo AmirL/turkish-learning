@@ -11,6 +11,7 @@ import { getLanguageLabel } from '~/utils/strings';
 import { UserService } from '~/services/user.service.server';
 import { AvatarService } from '~/services/avatar.service.server';
 import { TopicProgressService } from '~/services/topic-progress.service.server';
+import { UserRepository } from '~/services/database/user.repository.server';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -33,7 +34,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   switch (action) {
     case 'avatar':
       const newAvatar = await AvatarService.generateRandomAvatarImage();
-      await UserService.changeUserAvatar(user.id, newAvatar);
+      await UserRepository.update(user.id, { avatar: newAvatar });
       break;
     case 'settings':
       const learningMode = formData.get('learningMode');
@@ -43,7 +44,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         'Invalid learning mode'
       );
 
-      await UserService.updateUserLearningMode(user.id, Number(learningMode));
+      await UserRepository.update(user.id, { learningMode: Number(learningMode) });
       await TopicProgressService.recalcTopicProgress(user.id, Number(learningMode));
       break;
     default:
