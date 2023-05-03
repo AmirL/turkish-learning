@@ -25,7 +25,7 @@ export function StudyingTopic({ topic_id, words }: StudyingProps) {
   const [isMuted, setIsMuted] = useState(user.muteSpeach);
 
   function userAnswerHandler(correct: boolean) {
-    if (correct && wordsState.length < 3) {
+    if (correct && wordsState.length < 4) {
       StudyingService.markTopicAsCompleted(topic_id);
     }
 
