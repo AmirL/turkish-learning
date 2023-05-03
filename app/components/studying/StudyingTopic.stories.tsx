@@ -10,6 +10,8 @@ import {
 import { AppContext } from '../AppContext';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { faker } from '@faker-js/faker';
+import { WordWithProgress } from '~/services/word-progress.service.server';
+import { SerializeFrom } from '@remix-run/node';
 
 faker.seed(0);
 
@@ -39,11 +41,15 @@ const meta: Meta<typeof StudyingTopic> = {
 type Story = StoryObj<typeof StudyingTopic>;
 const topic = fakeTopic();
 
-function fakeWordWithProgress(overrides: any) {
+function fakeWordWithProgress(overrides: any): SerializeFrom<WordWithProgress> {
   return {
-    ...fakeWordWithTopic(overrides.topic),
-    ...fakeWordProgress(overrides),
+    ...SerializeFromConvert(fakeWordWithTopic(overrides.topic)),
+    ...SerializeFromConvert(fakeWordProgress(overrides)),
   };
+}
+
+function SerializeFromConvert<T>(data: T): SerializeFrom<T> {
+  return JSON.parse(JSON.stringify(data));
 }
 
 const WordsWithLevel0 = fakeMultiple(4, fakeWordWithProgress, { topic, level: 0 });
