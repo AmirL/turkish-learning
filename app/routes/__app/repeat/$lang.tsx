@@ -46,8 +46,8 @@ export default function StudyingTopic() {
       // remove word from words array
       wordsState.splice(0, 1);
     } else {
-      // decrease word level until it reaches 4
-      if (currentWord.level > 4) currentWord.level--;
+      // decrease word level until it reaches 5
+      if (currentWord.level > 5) currentWord.level--;
       // move word to 3 to 6 position
       arrayMoveMutable(wordsState, 0, Math.floor(Math.random() * 3) + 3);
     }
