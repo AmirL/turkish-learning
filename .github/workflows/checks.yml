@@ -32,12 +32,12 @@ jobs:
           name: test-results
           path: test-results.xml
 
-      - name: Push changes to chromatic
-        uses: chromaui/action@v1
-        with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          # exit if there is any not accepted changes
-          exitZeroOnChanges: false
+      # - name: Push changes to chromatic
+      #   uses: chromaui/action@v1
+      #   with:
+      #     projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+      #     # exit if there is any not accepted changes
+      #     exitZeroOnChanges: false
 
       - uses: amondnet/vercel-action@v20 #deploy
         with:

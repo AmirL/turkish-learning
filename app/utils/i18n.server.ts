@@ -5,7 +5,8 @@ import path from 'path';
 
 i18n.configure({
   locales: ['en', 'ru'],
-  directory: path.resolve('./public/locales/'),
+  directory: path.join(process.cwd(), 'public', 'locales'),
+  //path.resolve('./public/locales/'),
 });
 
 export const translatedStrings: any = {};
