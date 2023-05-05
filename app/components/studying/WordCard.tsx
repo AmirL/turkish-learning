@@ -2,6 +2,7 @@ import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { styled } from '@mui/system';
 import { SpeakText } from '../SpeakText';
+import { useTranslation } from '~/utils/useTranslation';
 
 export type Word = {
   word: string;
@@ -58,6 +59,8 @@ export function WordCard({ word, userAnswerHandler, isMuted, ...rest }: WordCard
   const text = flipped ? word.translation : word.word;
   const language = flipped ? languageTarget : languageSource;
 
+  const t = useTranslation();
+
   function flip() {
     setFlipped((prev) => !prev);
   }
@@ -87,11 +90,11 @@ export function WordCard({ word, userAnswerHandler, isMuted, ...rest }: WordCard
       </PaperStyled>
       {flipped ? (
         <Stack spacing={5} direction="row" justifyContent="center">
-          <CorrectButton onClick={CorrectButtonClicked}>Got it</CorrectButton>
-          <RepeatButton onClick={RepeatButtonClicked}>Repeat</RepeatButton>
+          <CorrectButton onClick={CorrectButtonClicked}>{t('Got it')}</CorrectButton>
+          <RepeatButton onClick={RepeatButtonClicked}>{t('Repeat')}</RepeatButton>
         </Stack>
       ) : null}
-      <p style={{ textAlign: 'center' }}>*Click on the word to flip</p>
+      <p style={{ textAlign: 'center' }}>*{t('Click on the word to flip')}</p>
     </Box>
   );
 }

@@ -7,6 +7,7 @@ import { UserService } from '~/services/user.service.server';
 import { AvatarService } from '~/services/avatar.service.server';
 import { SignupForm } from '~/components/auth/SignupForm';
 import { UserRepository } from '~/services/database/user.repository.server';
+import { UserLanguages } from '~/utils/strings';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -26,12 +27,14 @@ export const action: ActionFunction = async ({ request }) => {
   const password = formData.get('password');
   const confirmPassword = formData.get('confirmPassword');
   const redirectTo = formData.get('redirectTo');
+  const nativeLanguage = formData.get('nativeLanguage');
 
   if (
     typeof email !== 'string' ||
     typeof password !== 'string' ||
     typeof confirmPassword !== 'string' ||
-    typeof name !== 'string'
+    typeof name !== 'string' ||
+    typeof nativeLanguage !== 'string'
   ) {
     return badRequest({
       fieldErrors: null,
@@ -46,6 +49,7 @@ export const action: ActionFunction = async ({ request }) => {
     password: validatePassword(password),
     confirmPassword: validateConfirmPassword(password, confirmPassword),
     name: validateName(name),
+    nativeLanguage: validateNativeLanguage(nativeLanguage),
   };
 
   if (Object.values(fieldErrors).some((error) => error)) {
@@ -63,7 +67,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const avatar = await AvatarService.generateRandomAvatarImage();
 
-  const user = await UserService.createUser(email, password, name, avatar);
+  const user = await UserService.createUser({ email, password, name, avatar, nativeLanguage });
   return await login(user, request, redirectTo);
 };
 
@@ -106,4 +110,8 @@ function validateConfirmPassword(password: unknown, confirmPassword: unknown) {
 function validateName(name: unknown) {
   if (typeof name !== 'string') return 'Name is required';
   if (name.length < 2) return 'Name is too short';
+}
+
+function validateNativeLanguage(nativeLanguage: string) {
+  if (UserLanguages.indexOf(nativeLanguage) === -1) return 'Native language is invalid';
 }

@@ -10,8 +10,8 @@ import {
 import { AppContext } from '../AppContext';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { faker } from '@faker-js/faker';
-import { WordWithProgress } from '~/services/word-progress.service.server';
-import { SerializeFrom } from '@remix-run/node';
+import type { WordWithProgress } from '~/services/word-progress.service.server';
+import type { SerializeFrom } from '@remix-run/node';
 
 faker.seed(0);
 

@@ -10,18 +10,22 @@ import NavBar from '~/components/NavBar';
 import { styled } from '@mui/system';
 import { useState } from 'react';
 import { AppContext } from '~/components/AppContext';
-import { WordProgressService } from '~/services/word-progress.service.server';
 import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
+import i18n from 'i18n';
+import { translatedStrings } from '~/utils/i18n.server';
+import type { TranslatedKey } from '~/utils/useTranslation';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
+  i18n.setLocale(user.nativeLanguage);
+
   const repeatLanguages = await WordProgressRepository.languagesToRepeat(user.id, user.learningMode);
   // summ languages count
   const repeatCount = repeatLanguages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
 
-  return { user, repeatCount };
+  return { user, repeatCount, translated: translatedStrings };
 }
 
 const TopBarStyled = styled(Box)({
@@ -38,13 +42,23 @@ const TopBarStyled = styled(Box)({
 
 export default function AppLayout() {
   const location = useLocation();
-  const { user, repeatCount } = useLoaderData<typeof loader>();
+  const { user, repeatCount, translated } = useLoaderData<typeof loader>();
 
   const matches = useMatches();
   // find match with title in handle property
   const match = matches.find((match) => match.handle?.title ?? false);
-  const title = match?.handle?.title ?? false;
+  let title = match?.handle?.title ?? false;
 
+  function isTranslated(str: string): str is TranslatedKey {
+    return str in translated;
+  }
+
+  if (isTranslated(title)) {
+    title = translated[title];
+  }
+  // if (translatedStrings[title]) {
+  //   title = translatedStrings[title];
+  // }
   const transtion = useTransition();
 
   const loading = transtion.state === 'loading' || transtion.state === 'submitting';
@@ -53,7 +67,7 @@ export default function AppLayout() {
   const [repeatBadge, setRepeatBadge] = useState(repeatCount);
 
   return (
-    <AppContext.Provider value={{ repeatCount: repeatBadge, setRepeatCount: setRepeatBadge, user }}>
+    <AppContext.Provider value={{ repeatCount: repeatBadge, setRepeatCount: setRepeatBadge, user, translated }}>
       <Container maxWidth="sm">
         <TopBarStyled className={simpleBackground ? 'simpleBackground' : ''}>
           <Box

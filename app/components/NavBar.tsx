@@ -7,6 +7,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import LoopIcon from '@mui/icons-material/Loop';
+import { useTranslation } from '~/utils/useTranslation';
 
 type NavBarItem = {
   label: string;
@@ -22,11 +23,13 @@ export type NavBarProps = {
 } & Record<string, unknown>;
 
 export default function NavBar({ isAdmin, repeatCount, pathname = '/', ...rest }: NavBarProps) {
+  const t = useTranslation();
+
   const navBar: NavBarItem[] = [
-    { label: 'Home', icon: <HomeIcon />, link: '/' },
+    { label: t('Home'), icon: <HomeIcon />, link: '/' },
     // show repeat count on the icon badge
     {
-      label: 'Repeat',
+      label: t('Repeat'),
       icon: (
         <Badge badgeContent={repeatCount} color="error" anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
           <LoopIcon />
@@ -35,14 +38,14 @@ export default function NavBar({ isAdmin, repeatCount, pathname = '/', ...rest }
       link: '/repeat',
     },
 
-    { label: 'Charts', icon: <LeaderboardIcon />, link: '/charts' },
-    { label: 'Profile', icon: <AccountBoxIcon />, link: '/profile' },
+    { label: t('Charts'), icon: <LeaderboardIcon />, link: '/charts' },
+    { label: t('Profile'), icon: <AccountBoxIcon />, link: '/profile' },
   ];
 
   // remove import tab for non editors
   if (isAdmin) {
     // add admin tab for admins only
-    navBar.push({ label: 'Admin', icon: <AdminPanelSettingsIcon />, link: '/admin/import' });
+    navBar.push({ label: t('Admin'), icon: <AdminPanelSettingsIcon />, link: '/admin/import' });
   }
 
   return (

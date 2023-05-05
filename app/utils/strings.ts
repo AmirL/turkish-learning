@@ -10,3 +10,5 @@ export function getLanguageLabel(language: string) {
       return '🇷🇺 Russian';
   }
 }
+
+export const UserLanguages = ['en', 'ru'];

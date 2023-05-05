@@ -1,4 +1,5 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { useTranslation } from '~/utils/useTranslation';
 
 type IProps = {
   /**
@@ -20,15 +21,17 @@ type IProps = {
  * List of completed words for a topic
  */
 export function ListCompleted({ words }: IProps) {
+  const t = useTranslation();
+
   return (
     <TableContainer component={Paper} sx={{ mt: 4 }}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Word</TableCell>
-            <TableCell>Translation</TableCell>
-            <TableCell>Level</TableCell>
-            <TableCell>Next review</TableCell>
+            <TableCell>{t('Word')}</TableCell>
+            <TableCell>{t('Translation')}</TableCell>
+            <TableCell>{t('Level')}</TableCell>
+            <TableCell>{t('Next review')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -49,6 +52,7 @@ export function ListCompleted({ words }: IProps) {
 }
 
 function NextReviewFormatted({ nextReview }: { nextReview: string | null }) {
+  const t = useTranslation();
   const getDaysLeft = () => {
     if (!nextReview) {
       return '';
@@ -59,7 +63,9 @@ function NextReviewFormatted({ nextReview }: { nextReview: string | null }) {
     const timeDiff = reviewDate.getTime() - today.getTime();
     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    return daysDiff <= 0 ? 'Today' : `in ${daysDiff} days`;
+    const inDays = t('in %i days');
+
+    return daysDiff <= 0 ? t('Today') : inDays.replace('%i', daysDiff.toString());
   };
 
   return <>{getDaysLeft()}</>;

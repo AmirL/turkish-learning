@@ -1,10 +1,12 @@
-import { Button, Grid, TextField, Typography } from '@mui/material';
+import { Button, Grid, TextField, Typography, InputLabel, Select, MenuItem } from '@mui/material';
+import { UserLanguages, getLanguageLabel } from '~/utils/strings';
 
 interface SignupFormProps {
   actionData: {
     formError?: string;
     fields?: {
       name?: string;
+      nativeLanguage?: string;
       email?: string;
       password?: string;
       confirmPassword?: string;
@@ -86,6 +88,23 @@ export function SignupForm({ actionData, transtionState }: SignupFormProps) {
             error={!!actionData?.fieldErrors?.confirmPassword}
             helperText={actionData?.fieldErrors?.confirmPassword}
           />
+        </Grid>
+        <Grid item xs={12}>
+          <InputLabel id="nativeLanguageLabel">Native Language</InputLabel>
+          <Select
+            sx={{ width: '100%' }}
+            labelId="nativeLanguageLabel"
+            id="nativeLanguage"
+            name="nativeLanguage"
+            label="Native Language"
+            defaultValue={'en'}
+          >
+            {UserLanguages.map((lang) => (
+              <MenuItem key={lang} value={lang}>
+                {getLanguageLabel(lang)}
+              </MenuItem>
+            ))}
+          </Select>
         </Grid>
         <Grid item xs={12} justifyContent="center" display="flex">
           <Button type="submit" variant="contained" disabled={transtionState !== 'idle'}>

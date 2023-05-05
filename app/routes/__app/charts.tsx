@@ -32,11 +32,10 @@ import {
   wellKnownData,
 } from '~/components/charts/BarChart';
 
-import { StudySessionService } from '~/services/study-session.service.server';
-import { WordProgressService } from '~/services/word-progress.service.server';
 import { ListLearnedWords } from '~/components/charts/ListLearnedWords';
 import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
 import { StudySessionRepository } from '~/services/database/study-session.repository.server';
+import { useTranslation } from '~/utils/useTranslation';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -107,6 +106,13 @@ export default function ProgressCharts() {
     sessions.push({ language, sessions: languageSessions });
   });
 
+  const t = useTranslation();
+
+  wellKnownData.label = t('Well known words');
+  knownData.label = t('Known words');
+  repeatData.label = t('Repeat words');
+  rememberData.label = t('Remember words');
+
   return (
     <div>
       {init
@@ -130,7 +136,7 @@ export default function ProgressCharts() {
                       total={data.totalKnownWords}
                       lastLearnedWords={data.lastKnownWords}
                       language={session.language}
-                      title="Learned words"
+                      title={t('Learned words')}
                       backgroundColor="#C3DCBA"
                     />
                   </Grid>
@@ -139,7 +145,7 @@ export default function ProgressCharts() {
                       total={data.totalWellKnownWords}
                       lastLearnedWords={data.lastWellKnownWords}
                       language={session.language}
-                      title="Well known words"
+                      title={t('Well known words')}
                       backgroundColor="#A5C0B3"
                     />
                   </Grid>

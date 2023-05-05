@@ -12,6 +12,8 @@ const config: StorybookConfig = {
     autodocs: 'tag',
   },
   webpackFinal: async (config: any, { configType }) => {
+    config.resolve.fallback.fs = false;
+    config.resolve.fallback.url = false;
     config.resolve.alias = {
       ...config.resolve.alias,
       '~': path.resolve(__dirname, '../app'),

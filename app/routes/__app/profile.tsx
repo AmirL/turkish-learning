@@ -12,6 +12,7 @@ import { UserService } from '~/services/user.service.server';
 import { AvatarService } from '~/services/avatar.service.server';
 import { TopicProgressService } from '~/services/topic-progress.service.server';
 import { UserRepository } from '~/services/database/user.repository.server';
+import { useTranslation } from '~/utils/useTranslation';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -70,6 +71,8 @@ export default function UserProfile() {
     { value: '2', label: 'Both' },
   ];
 
+  const t = useTranslation();
+
   return (
     <>
       <Container sx={{ mt: 5 }}>
@@ -77,19 +80,23 @@ export default function UserProfile() {
           <UserAvatar avatar={data.user.avatar} sx={{ width: avatarSize, height: avatarSize, mb: 2 }} />
           <Form method="post">
             <Button variant="contained" type="submit" color="primary" disabled={loading} value="avatar" name="action">
-              Generate new avatar
+              {t('Generate new avatar')}
             </Button>
           </Form>
         </Box>
-        <Typography variant="subtitle1">Name: {data.user.name}</Typography>
-        <Typography variant="subtitle1">Email: {data.user.email}</Typography>
+        <Typography variant="subtitle1">
+          {t('Name')}: {data.user.name}
+        </Typography>
+        <Typography variant="subtitle1">
+          {t('Email')}: {data.user.email}
+        </Typography>
       </Container>
 
       <Container sx={{ mt: 15 }}>
-        <Typography variant="h4">Settings</Typography>
+        <Typography variant="h4">{t('Settings')}</Typography>
         <Form method="post">
           <Box sx={{ display: 'flex', flexDirection: 'column', mt: 3 }}>
-            <InputLabel id="nativeLanguage">Native language</InputLabel>
+            <InputLabel id="nativeLanguage">{t('Native language')}</InputLabel>
             {/* changing native language is not supported yet */}
             <Select name="nativeLanguage" value={data.user.nativeLanguage} label="Native language" disabled>
               {languageOptions.map((option) => (
@@ -100,7 +107,7 @@ export default function UserProfile() {
             </Select>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', mt: 3 }}>
-            <InputLabel id="learningMode">Learning mode</InputLabel>
+            <InputLabel id="learningMode">{t('Learning mode')}</InputLabel>
             <Select name="learningMode" defaultValue={data.user.learningMode} label="Learning mode">
               {learningModes.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
@@ -111,7 +118,7 @@ export default function UserProfile() {
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3 }}>
             <Button variant="contained" type="submit" color="primary" disabled={loading} value="settings" name="action">
-              Save
+              {t('Save')}
             </Button>
           </Box>
         </Form>
@@ -120,7 +127,7 @@ export default function UserProfile() {
       <Container sx={{ mt: 15 }}>
         <Form action="/logout" method="post">
           <Button variant="contained" type="submit" color="error">
-            Logout
+            {t('Logout')}
           </Button>
         </Form>
       </Container>

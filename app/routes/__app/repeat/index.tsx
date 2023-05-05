@@ -6,9 +6,9 @@ import { Link, useLoaderData } from '@remix-run/react';
 import { useContext, useEffect } from 'react';
 import { AppContext } from '~/components/AppContext';
 import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
-import { WordProgressService } from '~/services/word-progress.service.server';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
+import { useTranslation } from '~/utils/useTranslation';
 
 export const handle = {
   title: 'Repeat',
@@ -35,9 +35,11 @@ export default function SelectLanguage() {
     appContext.setRepeatCount?.(repeatCount);
   }, []);
 
+  const t = useTranslation();
+
   return (
     <div>
-      <h1>Select language to repeat</h1>
+      <h1>{t('Select language to repeat')}</h1>
       <Stack spacing={3}>
         {languages.map((language) => (
           <Button key={language.language} variant="contained" component={Link} to={`/repeat/${language.language}`}>

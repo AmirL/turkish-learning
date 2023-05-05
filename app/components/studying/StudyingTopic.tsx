@@ -17,7 +17,6 @@ type StudyingProps = {
 };
 
 export function StudyingTopic({ topic_id, words }: StudyingProps) {
-  console.log(words);
   const [wordsState, setWordsState] = useState(words.filter((word) => word.level < 5));
   const [currentWord, setCurrentWord] = useState(wordsState[0]);
 

@@ -5,21 +5,30 @@ import invariant from 'ts-invariant';
 import { UserRepository } from './database/user.repository.server';
 export type { User } from '@prisma/client';
 
+type CreateUserInput = {
+  email: string;
+  password: string;
+  name: string;
+  avatar: string;
+  nativeLanguage: string;
+};
+
 export class UserService {
   static async hashPassword(password: string) {
     return bcrypt.hash(password, 10);
   }
 
-  static async createUser(email: string, password: string, name: string, avatar: string): Promise<User> {
-    const hashedPassword = await this.hashPassword(password);
+  static async createUser(input: CreateUserInput): Promise<User> {
+    const hashedPassword = await this.hashPassword(input.password);
     // check if at least one user exists in db
     const usersCount = await UserRepository.count();
     const isFirstUser = usersCount === 0;
 
     const user = await UserRepository.create({
-      email,
-      name,
-      avatar,
+      email: input.email,
+      name: input.name,
+      avatar: input.avatar,
+      nativeLanguage: input.nativeLanguage,
       password: hashedPassword,
       isEditor: isFirstUser ? true : false,
       isAdmin: isFirstUser ? true : false,
