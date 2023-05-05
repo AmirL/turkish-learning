@@ -1,12 +1,11 @@
 import type { TranslatedKey } from './useTranslation';
 import { TranslatedStringsKeys } from './useTranslation';
-import path from 'path';
 
-import { promises as fs } from 'fs';
+import langRuJson from './locales/ru.json';
+import langEnJson from './locales/en.json';
 
 export async function getTranslatedStrings(lang: string) {
-  const langFile = path.join(process.cwd(), 'locales', `${lang}.json`);
-  const data = JSON.parse(await fs.readFile(langFile, 'utf8'));
+  const data = lang === 'ru' ? langRuJson : langEnJson;
   const translatedStrings: any = {};
 
   for (const i in TranslatedStringsKeys) {
