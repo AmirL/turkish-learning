@@ -22,7 +22,9 @@ export async function loader({ request }: LoaderArgs) {
   // summ languages count
   const repeatCount = repeatLanguages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
 
-  return { user, repeatCount, translated: getTranslatedStrings(user.nativeLanguage) };
+  const translated = await getTranslatedStrings(user.nativeLanguage);
+
+  return { user, repeatCount, translated };
 }
 
 const TopBarStyled = styled(Box)({
