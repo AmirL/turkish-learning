@@ -11,8 +11,6 @@ import createEmotionServer from '@emotion/server/create-instance';
 
 import * as Sentry from '@sentry/remix';
 import { db } from './utils/db.server';
-import { resolve } from 'node:path';
-import i18n from 'i18n';
 
 export default function handleRequest(
   request: Request,
@@ -22,11 +20,6 @@ export default function handleRequest(
 ) {
   const cache = createEmotionCache();
   const { extractCriticalToChunks } = createEmotionServer(cache);
-
-  i18n.configure({
-    locales: ['en', 'ru'],
-    directory: resolve('./public/locales/'),
-  });
 
   function MuiRemixServer() {
     return (

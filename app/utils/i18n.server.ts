@@ -1,6 +1,12 @@
 import i18n from 'i18n';
 import type { TranslatedKey } from './useTranslation';
 import { TranslatedStringsKeys } from './useTranslation';
+import path from 'path';
+
+i18n.configure({
+  locales: ['en', 'ru'],
+  directory: path.resolve('./public/locales/'),
+});
 
 export const translatedStrings: any = {};
 
