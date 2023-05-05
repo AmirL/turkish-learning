@@ -18,6 +18,8 @@ import ClientStyleContext from '~/mui/ClientStyleContext';
 import { useContext, useEffect } from 'react';
 import mainStyle from '~/css/layout.css';
 
+import { withSentry } from '@sentry/remix';
+
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: 'Learning Words',
@@ -126,13 +128,15 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
   );
 });
 
-export default function App() {
+function App() {
   return (
     <Document>
       <Outlet />
     </Document>
   );
 }
+
+export default withSentry(App);
 
 // https://remix.run/docs/en/v1/api/conventions#errorboundary
 export function ErrorBoundary({ error }: { error: Error }) {

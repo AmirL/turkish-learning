@@ -9,6 +9,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CacheProvider } from '@emotion/react';
 import createEmotionServer from '@emotion/server/create-instance';
 
+import * as Sentry from '@sentry/remix';
+import { db } from './utils/db.server';
+
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -57,3 +60,10 @@ export default function handleRequest(
     headers: responseHeaders,
   });
 }
+
+Sentry.init({
+  dsn: 'https://9e130ddde1be47cabf02b532b1575e1e:00cc553b3c9642039186f3b2a2aee384@o4504535704666112.ingest.sentry.io/4505130495639552',
+  integrations: [new Sentry.Integrations.Prisma({ client: db })],
+  // Performance Monitoring
+  tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
+});
