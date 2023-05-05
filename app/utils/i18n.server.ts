@@ -1,18 +1,17 @@
-import i18n from 'i18n';
 import type { TranslatedKey } from './useTranslation';
 import { TranslatedStringsKeys } from './useTranslation';
 import path from 'path';
 
-i18n.configure({
-  locales: ['en', 'ru'],
-  directory: path.join(process.cwd(), 'public', 'locales'),
-  //path.resolve('./public/locales/'),
-});
+export function getTranslatedStrings(lang: string) {
+  const langFile = path.join(process.cwd(), 'public', 'locales', `${lang}.json`);
+  const data = require(langFile);
+  const translatedStrings: any = {};
 
-export const translatedStrings: any = {};
+  for (const i in TranslatedStringsKeys) {
+    const key: TranslatedKey = TranslatedStringsKeys[i];
+    // generate&fill translated strings
+    translatedStrings[key] = data[key] ?? key;
+  }
 
-for (const i in TranslatedStringsKeys) {
-  const key: TranslatedKey = TranslatedStringsKeys[i];
-  // generate&fill translated strings
-  translatedStrings[key] = i18n.__(key);
+  return translatedStrings;
 }

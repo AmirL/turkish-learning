@@ -11,21 +11,18 @@ import { styled } from '@mui/system';
 import { useState } from 'react';
 import { AppContext } from '~/components/AppContext';
 import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
-import i18n from 'i18n';
-import { translatedStrings } from '~/utils/i18n.server';
+import { getTranslatedStrings } from '~/utils/i18n.server';
 import type { TranslatedKey } from '~/utils/useTranslation';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
 
-  i18n.setLocale(user.nativeLanguage);
-
   const repeatLanguages = await WordProgressRepository.languagesToRepeat(user.id, user.learningMode);
   // summ languages count
   const repeatCount = repeatLanguages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
 
-  return { user, repeatCount, translated: translatedStrings };
+  return { user, repeatCount, translated: getTranslatedStrings(user.nativeLanguage) };
 }
 
 const TopBarStyled = styled(Box)({
