@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { styled } from '@mui/system';
 import { SpeakText } from '../SpeakText';
 import { useTranslation } from '~/utils/useTranslation';
+import { userStore } from '~/routes/__app';
+import { observer } from 'mobx-react-lite';
 
 export type Word = {
   word: string;
@@ -15,7 +17,6 @@ export type Word = {
 };
 
 type WordCardProps = {
-  isMuted: boolean;
   word: Word;
   userAnswerHandler: (correct: boolean) => void;
   flipped?: boolean;
@@ -50,7 +51,7 @@ const PaperStyled = styled(Paper)(({ theme }) => ({
   },
 }));
 
-export function WordCard({ word, userAnswerHandler, isMuted, ...rest }: WordCardProps) {
+export const WordCard = observer(({ word, userAnswerHandler, ...rest }: WordCardProps) => {
   const [flipped, setFlipped] = useState(rest.flipped ?? false);
 
   const languageSource = !word.isReversed ? word.topic.languageSource : word.topic.languageTarget;
@@ -76,10 +77,10 @@ export function WordCard({ word, userAnswerHandler, isMuted, ...rest }: WordCard
   }
 
   useEffect(() => {
-    if (!isMuted) {
+    if (!userStore.user.muteSpeach) {
       SpeakText(text, language);
     }
-  }, [text, language, isMuted]);
+  }, [text, language]);
 
   return (
     <Box>
@@ -97,4 +98,4 @@ export function WordCard({ word, userAnswerHandler, isMuted, ...rest }: WordCard
       <p style={{ textAlign: 'center' }}>*{t('Click on the word to flip')}</p>
     </Box>
   );
-}
+});

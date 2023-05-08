@@ -8,6 +8,8 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import LoopIcon from '@mui/icons-material/Loop';
 import { useTranslation } from '~/utils/useTranslation';
+import { observer } from 'mobx-react-lite';
+import { userStore } from '~/routes/__app';
 
 type NavBarItem = {
   label: string;
@@ -17,12 +19,11 @@ type NavBarItem = {
 
 export type NavBarProps = {
   isAdmin: boolean;
-  repeatCount: number;
   // can be one of [/, /repeat, /charts, /profile, /admin/import]
   pathname: string;
 } & Record<string, unknown>;
 
-export default function NavBar({ isAdmin, repeatCount, pathname = '/', ...rest }: NavBarProps) {
+export default observer(({ isAdmin, pathname = '/', ...rest }: NavBarProps) => {
   const t = useTranslation();
 
   const navBar: NavBarItem[] = [
@@ -31,7 +32,11 @@ export default function NavBar({ isAdmin, repeatCount, pathname = '/', ...rest }
     {
       label: t('Repeat'),
       icon: (
-        <Badge badgeContent={repeatCount} color="error" anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+        <Badge
+          badgeContent={userStore.repeatCount}
+          color="error"
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
           <LoopIcon />
         </Badge>
       ),
@@ -41,6 +46,10 @@ export default function NavBar({ isAdmin, repeatCount, pathname = '/', ...rest }
     { label: t('Charts'), icon: <LeaderboardIcon />, link: '/charts' },
     { label: t('Profile'), icon: <AccountBoxIcon />, link: '/profile' },
   ];
+
+  if (userStore.repeatCount === 0) {
+    navBar.splice(1, 1);
+  }
 
   // remove import tab for non editors
   if (isAdmin) {
@@ -69,4 +78,4 @@ export default function NavBar({ isAdmin, repeatCount, pathname = '/', ...rest }
       </BottomNavigation>
     </Paper>
   );
-}
+});

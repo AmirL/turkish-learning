@@ -1,14 +1,14 @@
 import { LinearProgress } from '@mui/material';
 import { WordCard } from '~/components/studying/WordCard';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Completed } from '~/components/studying/Completed';
-import { AppContext } from '../AppContext';
 
-import { StudyingService } from '~/services/studying-service';
 import { MuteButton } from '../MuteButton';
 import type { WordWithProgress } from '~/services/word-progress.service.server';
 import type { SerializeFrom } from '@remix-run/node';
 import { ListCompleted } from './ListCompleted';
+import { StudyingWordsStore } from '~/stores/words-store';
+import { observer } from 'mobx-react-lite';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 type StudyingProps = {
@@ -16,47 +16,27 @@ type StudyingProps = {
   words: SerializeFrom<WordWithProgress>[];
 };
 
-export function StudyingTopic({ topic_id, words }: StudyingProps) {
-  const [wordsState, setWordsState] = useState(words.filter((word) => word.level < 5));
-  const [currentWord, setCurrentWord] = useState(wordsState[0]);
-
-  const { user } = useContext(AppContext);
-  const [isMuted, setIsMuted] = useState(user.muteSpeach);
+export const StudyingTopic = observer(({ topic_id, words }: StudyingProps) => {
+  const [wordsStore] = useState(new StudyingWordsStore(words, topic_id));
 
   function userAnswerHandler(correct: boolean) {
-    if (correct && wordsState.length < 4) {
-      StudyingService.markTopicAsCompleted(topic_id);
-    }
-
-    StudyingService.updateWordLevel(correct, currentWord);
-    StudyingService.saveWordProgress({ ...currentWord, correct });
-
-    StudyingService.moveCurrentWord(correct, currentWord.level, wordsState);
-
-    // save new order
-    setWordsState(wordsState);
-    // set new word
-    setCurrentWord(wordsState[0]);
+    wordsStore.answer(correct);
   }
-
-  // summ of all levels
-  const progress = StudyingService.getProgress(words);
-  const completed = wordsState.length < 3;
 
   return (
     <>
-      {completed ? (
+      {wordsStore.completed ? (
         <>
           <Completed />
-          <ListCompleted words={words} />
+          <ListCompleted words={wordsStore.baseWords} />
         </>
       ) : (
         <>
-          <LinearProgress variant="determinate" value={progress * 100} />
-          <WordCard word={currentWord} userAnswerHandler={userAnswerHandler} isMuted={isMuted} />
-          <MuteButton muteSpeach={isMuted} setIsMuted={setIsMuted} />
+          <LinearProgress variant="determinate" value={wordsStore.progress} />
+          <WordCard word={wordsStore.currentWord} userAnswerHandler={userAnswerHandler} />
+          <MuteButton />
         </>
       )}
     </>
   );
-}
+});

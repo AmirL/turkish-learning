@@ -1,19 +1,15 @@
 import { Box, Button } from '@mui/material';
-import axios from 'axios';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import { userStore } from '~/routes/__app';
+import { observer } from 'mobx-react-lite';
 
-export function MuteButton({ muteSpeach, setIsMuted }: { muteSpeach: boolean; setIsMuted: (value: boolean) => void }) {
-  function switchMute() {
-    setIsMuted(!muteSpeach);
-    axios.post('/user/mute', { muteSpeach: !muteSpeach });
-  }
-
+export const MuteButton = observer(() => {
   return (
     <Box sx={{ textAlign: 'center' }}>
-      <Button onClick={switchMute} variant="outlined">
-        {muteSpeach ? <VolumeOffIcon /> : <VolumeUpIcon />}
+      <Button onClick={() => userStore.toggleMuteSpeach()} variant="outlined">
+        {userStore.user.muteSpeach ? <VolumeOffIcon /> : <VolumeUpIcon />}
       </Button>
     </Box>
   );
-}
+});

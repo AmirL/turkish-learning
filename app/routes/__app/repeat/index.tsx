@@ -3,8 +3,7 @@
 import { Button, Stack } from '@mui/material';
 import type { LoaderArgs } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
-import { useContext, useEffect } from 'react';
-import { AppContext } from '~/components/AppContext';
+import { userStore } from '~/routes/__app';
 import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
 import { requireUser } from '~/utils/auth.server';
 import { getLanguageLabel } from '~/utils/strings';
@@ -28,12 +27,8 @@ export async function loader({ request }: LoaderArgs) {
 export default function SelectLanguage() {
   const { languages } = useLoaderData<typeof loader>();
 
-  const appContext = useContext(AppContext);
-
-  useEffect(() => {
-    const repeatCount = languages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
-    appContext.setRepeatCount?.(repeatCount);
-  }, []);
+  // const repeatCount = languages.reduce((acc, lang) => acc + parseInt(lang.count, 10), 0);
+  // userStore.setRepeatCount(repeatCount);
 
   const t = useTranslation();
 

@@ -44,6 +44,7 @@ export async function loader({ request, params }: LoaderArgs) {
 }
 
 export default function Topic() {
+
   const { topic, words } = useLoaderData<typeof loader>();
 
   return (

@@ -62,6 +62,7 @@ export default function handleRequest(
 }
 
 Sentry.init({
+  environment: process.env.NODE_ENV,
   dsn: 'https://9e130ddde1be47cabf02b532b1575e1e:00cc553b3c9642039186f3b2a2aee384@o4504535704666112.ingest.sentry.io/4505130495639552',
   integrations: [new Sentry.Integrations.Prisma({ client: db })],
   // Performance Monitoring

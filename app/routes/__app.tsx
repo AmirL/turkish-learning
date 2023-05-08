@@ -13,7 +13,10 @@ import { AppContext } from '~/components/AppContext';
 import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
 import { getTranslatedStrings } from '~/utils/i18n.server';
 import type { TranslatedKey } from '~/utils/useTranslation';
+import { UserStore } from '~/stores/user-store';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
+
+export var userStore: UserStore;
 
 export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
@@ -42,6 +45,11 @@ const TopBarStyled = styled(Box)({
 export default function AppLayout() {
   const location = useLocation();
   const { user, repeatCount, translated } = useLoaderData<typeof loader>();
+
+  if (!userStore || userStore.user.id !== user.id) {
+    userStore = new UserStore(user);
+    userStore.setRepeatCount(repeatCount);
+  }
 
   const matches = useMatches();
   // find match with title in handle property
