@@ -1,4 +1,4 @@
-let msgSource = new Map<string, SpeechSynthesisUtterance>();
+const msgSource = new Map<string, SpeechSynthesisUtterance>();
 // let msgTarget: SpeechSynthesisUtterance | null = null;
 
 export function InitSpeech() {
@@ -21,6 +21,7 @@ export function InitSpeech() {
 const getLanguage = (names: string[], lang: string) => {
   const voices = window.speechSynthesis.getVoices();
   const voicesFiltered = voices.filter((voice) => voice.lang.startsWith(lang));
+  // console.log(lang, voicesFiltered);
 
   // console.log('Voices for', lang, voicesFiltered);
 

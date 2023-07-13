@@ -55,8 +55,9 @@ export class RepeatingWordsStore extends WordStoreAbstract {
     if (correct) {
       this.currentWord.level++;
     } else {
+      this.currentWord.level -= 2;
       // decrease word level until it reaches 5
-      if (this.currentWord.level > 5) this.currentWord.level--;
+      if (this.currentWord.level < 5) this.currentWord.level = 5;
     }
     StudyingService.saveWordProgress({ ...this.currentWord, correct });
 
