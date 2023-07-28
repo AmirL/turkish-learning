@@ -6,7 +6,7 @@ export function InitSpeech() {
     return;
   }
 
-  const voices = window.speechSynthesis.getVoices();
+  window.speechSynthesis.getVoices();
   // console.log('voices', voices);
 
   const langs = ['en', 'ru', 'tr'];

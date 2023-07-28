@@ -4,25 +4,9 @@ import type { LoaderArgs, SerializeFrom } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { requireUser } from '~/utils/auth.server';
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend,
-  TimeScale,
-} from 'chart.js';
-
-import { useEffect, useState } from 'react';
-import { useLoaderData } from '@remix-run/react';
-import type { StudySession } from '@prisma/client';
-import { getLanguageLabel } from '~/utils/strings';
 import { Grid } from '@mui/material';
+import type { StudySession } from '@prisma/client';
+import { useLoaderData } from '@remix-run/react';
 import {
   BarChart,
   barChartLabels,
@@ -31,11 +15,15 @@ import {
   repeatData,
   wellKnownData,
 } from '~/components/charts/BarChart';
+import { getLanguageLabel } from '~/utils/strings';
 
 import { ListLearnedWords } from '~/components/charts/ListLearnedWords';
-import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
+import { WordsLevelsChart } from '~/components/charts/WordsLevelsChart';
 import { StudySessionRepository } from '~/services/database/study-session.repository.server';
+import { WordProgressRepository } from '~/services/database/word-progress.repository.server';
 import { useTranslation } from '~/utils/useTranslation';
+import { Suspense } from 'react';
+import invariant from 'ts-invariant';
 export { ErrorBoundary } from '~/components/ErrorBoundary';
 
 export const handle = {
@@ -74,29 +62,18 @@ export async function loader({ request }: LoaderArgs) {
   const totalKnownWords = await WordProgressRepository.getUserTotalWords(user.id, 'known');
   const totalWellKnownWords = await WordProgressRepository.getUserTotalWords(user.id, 'wellKnown');
 
-  return json({ sessions, languages, lastKnownWords, lastWellKnownWords, totalKnownWords, totalWellKnownWords }, 200);
+  const levels = await WordProgressRepository.getUserWordsLevels(user.id);
+  invariant(levels.length > 0, 'Levels should not be empty');
+
+  console.log('levels', levels);
+
+  return json(
+    { sessions, languages, lastKnownWords, lastWellKnownWords, totalKnownWords, totalWellKnownWords, levels },
+    200
+  );
 }
 
 export default function ProgressCharts() {
-  const [init, setInit] = useState(false);
-
-  useEffect(() => {
-    if (init) return;
-    ChartJS.register(
-      TimeScale,
-      CategoryScale,
-      LinearScale,
-      BarElement,
-      PointElement,
-      LineElement,
-      Title,
-      Tooltip,
-      Filler,
-      Legend
-    );
-    setInit(true);
-  }, [init]);
-
   const data = useLoaderData<typeof loader>();
 
   const sessions: { language: string; sessions: SerializeFrom<StudySession>[] }[] = [];
@@ -115,45 +92,48 @@ export default function ProgressCharts() {
 
   return (
     <div>
-      {init
-        ? sessions.map((session) => {
-            return (
-              <div key={session.language}>
-                <h2>{getLanguageLabel(session.language)}</h2>
-                <BarChart
-                  labels={barChartLabels(session.sessions)}
-                  data={session.sessions}
-                  datasets={[repeatData, rememberData]}
-                />
-                <BarChart
-                  labels={barChartLabels(session.sessions)}
-                  data={session.sessions}
-                  datasets={[wellKnownData, knownData]}
-                />
-                <Grid container spacing={2} gridTemplateColumns="repeat(2, 1fr)">
-                  <Grid item xs={6}>
-                    <ListLearnedWords
-                      total={data.totalKnownWords}
-                      lastLearnedWords={data.lastKnownWords}
-                      language={session.language}
-                      title={t('Learned words')}
-                      backgroundColor="#C3DCBA"
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <ListLearnedWords
-                      total={data.totalWellKnownWords}
-                      lastLearnedWords={data.lastWellKnownWords}
-                      language={session.language}
-                      title={t('Well known words')}
-                      backgroundColor="#A5C0B3"
-                    />
-                  </Grid>
+      <Suspense fallback={<div>Loading...</div>}>
+        {sessions.map((session) => {
+          return (
+            <div key={session.language}>
+              <h2>{getLanguageLabel(session.language)}</h2>
+              <BarChart
+                labels={barChartLabels(session.sessions)}
+                data={session.sessions}
+                datasets={[repeatData, rememberData]}
+              />
+              <BarChart
+                labels={barChartLabels(session.sessions)}
+                data={session.sessions}
+                datasets={[wellKnownData, knownData]}
+              />
+              <Grid container spacing={2} gridTemplateColumns="repeat(2, 1fr)">
+                <Grid item xs={12}>
+                  <WordsLevelsChart levels={data.levels.filter((level) => level.language === session.language)} />
                 </Grid>
-              </div>
-            );
-          })
-        : null}
+                <Grid item xs={6}>
+                  <ListLearnedWords
+                    total={data.totalKnownWords}
+                    lastLearnedWords={data.lastKnownWords}
+                    language={session.language}
+                    title={t('Learned words')}
+                    backgroundColor="#C3DCBA"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <ListLearnedWords
+                    total={data.totalWellKnownWords}
+                    lastLearnedWords={data.lastWellKnownWords}
+                    language={session.language}
+                    title={t('Well known words')}
+                    backgroundColor="#A5C0B3"
+                  />
+                </Grid>
+              </Grid>
+            </div>
+          );
+        })}
+      </Suspense>
     </div>
   );
 }

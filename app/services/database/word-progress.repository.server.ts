@@ -56,6 +56,33 @@ export class WordProgressRepository {
     });
   }
 
+  static async getUserWordsLevels(user_id: number) {
+    type Res = {
+      language: string;
+      level: number;
+      count: number;
+    };
+    const res: Res[] = await db.$queryRaw`
+      SELECT
+        t.languageSource as language,
+        wp.level,
+        COUNT(*) as count
+      FROM
+        WordProgress wp
+      INNER JOIN Word w ON w.id = wp.word_id
+      INNER JOIN Topic t ON t.id = w.topic_id
+      WHERE
+        wp.user_id = ${user_id}
+      GROUP BY
+        wp.level,
+        t.languageSource
+      ORDER BY
+        t.languageSource ASC,
+        wp.level ASC`;
+
+    return res;
+  }
+
   static async getUserTotalWords(user_id: number, status: WordStatus) {
     let wordStatusFilter = Prisma.sql``;
 

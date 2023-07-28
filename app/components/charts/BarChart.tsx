@@ -1,5 +1,31 @@
-import { Bar } from 'react-chartjs-2';
 import type { StudySession } from '@prisma/client';
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  TimeScale,
+  Title,
+  Tooltip,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  TimeScale,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
 
 interface Dataset {
   label: string;
