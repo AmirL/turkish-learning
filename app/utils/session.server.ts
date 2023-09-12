@@ -4,7 +4,8 @@ if (!process.env.SESSION_SECRET) {
   throw new Error('Please add a SESSION_SECRET to your .env file');
 }
 
-const maxAge = Number(process.env.LOGIN_SESSION_DURATION) || 60 * 60 * 365;
+// 10 years
+const maxAge = Number(process.env.LOGIN_SESSION_DURATION) || 60 * 60 * 24 * 365 * 10;
 
 // export the whole sessionStorage object
 export let sessionStorage = createCookieSessionStorage({
